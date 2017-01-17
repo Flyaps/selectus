@@ -1,0 +1,33 @@
+{
+  "name": "selectus",
+  "version": "1.0.0",
+  "description": "Selecus plugin for jQuery",
+  "devDependencies": {
+    "webpack": "1.14.0",
+    "babel-core": "6.21.0",
+    "babel-loader": "6.2.10",
+    "babel-preset-es2015": "6.18.0",
+    "css-loader": "0.26.1",
+    "style-loader": "0.13.1",
+    "stylus": "0.54.5",
+    "stylus-loader": "2.4.0",
+    "autoprefixer": "6.6.1",
+    "postcss-loader": "1.2.2",
+    "imports-loader": "0.7.0",
+    "extract-text-webpack-plugin": "1.0.1",
+    "jquery": "3.1.1",
+    "lodash": "4.17.4"
+  },
+  "scripts": {
+    "build": "WEBPACK_ENV=build webpack",
+    "dev": "WEBPACK_ENV=dev webpack --progress --watch"
+  },
+  "keywords": [
+    "selectus",
+    "select",
+    "jQuery",
+    "plugin"
+  ],
+  "author": "Nikita Zhukov",
+  "license": "ISC"
+}
