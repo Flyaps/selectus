@@ -5,9 +5,11 @@ var webpack = require('webpack');
 var autoprefixer = require('autoprefixer');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 
+var name = 'selectus';
+
 var env = process.env.WEBPACK_ENV;
-var plugins = [new ExtractTextPlugin("[name].css")];
-var filename = '[name]';
+var plugins = [new ExtractTextPlugin(name + '.css')];
+var filename = name;
 
 if (env === 'build') {
 
@@ -41,7 +43,18 @@ module.exports = {
    output: {
       path: path.join(__dirname, 'build'),
       // The filename of the entry chunk as relative path inside the output.path directory.
-      filename: filename
+      filename: filename,
+      library: name,
+      libraryTarget: 'umd'
+   },
+
+   externals: {
+      'jquery': {
+         commonjs: 'jquery',
+         commonjs2: 'jquery',
+         amd: 'jquery',
+         root: 'jQuery'
+      }
    },
 
    watchOptions: {
@@ -81,11 +94,7 @@ module.exports = {
          {
             test: /\.styl$/,
             loader: ExtractTextPlugin.extract('style', 'css?-url&-import!postcss!stylus')
-         },
-         // {
-         //   test: /[\/\\]node_modules[\/\\]perfect-scrollbar[\/\\]src[\/\\]js[\/\\]adaptor[\/\\]jquery\.js$/,
-         //   loader: "imports?define=>false"
-         // }
+         }
       ]
    },
 

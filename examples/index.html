@@ -3,20 +3,86 @@
 <head>
    <meta charset="UTF-8">
    <title>Selectus</title>
-   <link href="./build/main.css" rel="stylesheet">
-   <script src="./build/main.js"></script>
+
+   <link href="../node_modules/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+   <link href="../build/selectus.css" rel="stylesheet">
+
+   <script src="../node_modules/jquery/dist/jquery.min.js"></script>
+   <script src="../build/selectus.js"></script>
 </head>
 <body>
 
 <script>
 
-   $(function () {
-      $('.select').selectus();
-   });
+//   $(function () {
+////      $('.select').test();
+////      $('.select').selectus();
+//   });
 
 </script>
 
-<div class="select"></div>
+<div class="selectus">
+   Alliances (35):
+
+   <span class="selectus__item">
+      Vimpcom
+   </span>
+
+   <span class="selectus__item">
+      Avea
+   </span>
+
+   <span class="selectus__item">
+      Bite
+   </span>
+
+   ... <a href>and 3 more</a>
+
+   <div class="selectus__dropdown">
+
+      <div class="selectus__search fa fa-search">
+         <input class="selectus__search-input">
+      </div>
+
+      <p class="selectus__dropdown-item">
+         <span class="selectus__dropdown-item-wrap fa fa-times">
+            Select all (1 754)
+         </span>
+      </p>
+
+      <p class="selectus__dropdown-item">
+         <span class="selectus__dropdown-item-wrap fa fa-times">
+            America Movil
+         </span>
+      </p>
+
+      <p class="selectus__dropdown-item">
+         <span class="selectus__dropdown-item-wrap fa fa-times">
+            At&t
+         </span>
+      </p>
+
+      <p class="selectus__dropdown-item">
+         <span class="selectus__dropdown-item-wrap fa fa-times">
+            Avea
+         </span>
+      </p>
+
+      <p class="selectus__dropdown-item">
+         <span class="selectus__dropdown-item-wrap fa fa-times">
+            Bite
+         </span>
+      </p>
+
+      <p class="selectus__dropdown-item">
+         <span class="selectus__dropdown-item-wrap fa fa-times">
+            Orange
+         </span>
+      </p>
+
+   </div>
+
+</div>
 
 </body>
 </html>

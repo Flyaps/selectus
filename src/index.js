@@ -1,21 +1,6 @@
+require('./main.styl');
+
 import $ from 'jquery';
-
-(function (root, factory) {
-   if (typeof exports === 'object' && typeof module === 'object')
-      module.exports = factory();
-   else if (typeof define === 'function' && define.amd)
-      define("library", [], factory);
-   else if (typeof exports === 'object')
-      exports["library"] = factory();
-   else
-      root["library"] = factory();
-})(this, function () {
-   return function (modules) {
-
-
-   }
-});
-
 
 let plugin = (pluginName, className, shortHand = false) => {
    let dataName = `__${pluginName}`;
@@ -47,25 +32,25 @@ let plugin = (pluginName, className, shortHand = false) => {
 }
 
 class Select3 {
+
    constructor(element, options) {
+
       const $element = $(element);
 
-      $(window).scroll(function () {
-         if ($(this).scrollTop() > options.offset) {
-            $element.fadeIn();
-         } else {
-            $element.fadeOut();
-         }
+      $('body').on('click', function () {
+         console.log(12345);
       });
 
-      $element.click(function (e) {
-         e.preventDefault();
-
-         $('html, body').animate({
-            scrollTop: 0
-         }, options.speed);
-      });
    }
+
+   static staticMethod() {
+      return 'staticMethod';
+   }
+
+   prototypeMethod() {
+      return 'prototypeMethod';
+   }
+
 }
 
 Select3.DEFAULTS = {
@@ -73,30 +58,6 @@ Select3.DEFAULTS = {
    speed: 500,
 };
 
-plugin('ScrollToTop', ScrollToTop);
-
-
-/**
- * Generate a jQuery plugin
- * @param pluginName [string] Plugin name
- * @param className [object] Class of the plugin
- * @param shortHand [bool] Generate a shorthand as $.pluginName
- *
- * @example
- * import plugin from 'plugin';
- *
- * class MyPlugin {
- *     constructor(element, options) {
- *         // ...
- *     }
- * }
- *
- * MyPlugin.DEFAULTS = {};
- *
- * plugin('myPlugin', MyPlugin');
- */
-
-
-
-
 plugin('select3', Select3);
+
+export default Select3;
