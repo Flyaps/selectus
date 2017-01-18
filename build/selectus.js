@@ -7,7 +7,7 @@
 		exports["selectus"] = factory(require("jquery"));
 	else
 		root["selectus"] = factory(root["jQuery"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_5__) {
+})(this, function(__WEBPACK_EXTERNAL_MODULE_1__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -64,7 +64,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-	var _jquery = __webpack_require__(5);
+	var _jquery = __webpack_require__(1);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
@@ -72,7 +72,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	__webpack_require__(1);
+	__webpack_require__(2);
+
+	console.log('$', _jquery2.default);
 
 	var plugin = function plugin(pluginName, className) {
 	   var shortHand = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
@@ -109,18 +111,80 @@ return /******/ (function(modules) { // webpackBootstrap
 	   };
 	};
 
-	var Select3 = function () {
-	   function Select3(element, options) {
-	      _classCallCheck(this, Select3);
+	var Selectus = function () {
+	   function Selectus(element, options) {
+	      _classCallCheck(this, Selectus);
 
 	      var $element = (0, _jquery2.default)(element);
 
-	      (0, _jquery2.default)('body').on('click', function () {
-	         console.log(12345);
+	      // dropdown
+
+	      var $dropdown = (0, _jquery2.default)('.selectus__dropdown');
+
+	      var dropdownOpenClass = 'selectus_dropdown-open';
+
+	      $element.on('click', '.selectus__current-type', function (e) {
+	         e.preventDefault();
+
+	         if (!$element.hasClass(dropdownOpenClass)) {
+	            $dropdown.show();
+	         }
+
+	         $element.toggleClass(dropdownOpenClass);
+	      });
+
+	      // tabs
+
+	      var tabSelectedClass = 'selectus__tab_selected';
+	      var listSelectedClass = 'selectus__list_selected';
+
+	      $element.on('click', '.selectus__tab', function (e) {
+
+	         e.preventDefault();
+
+	         var $self = (0, _jquery2.default)(e.target);
+
+	         if ($self.hasClass(tabSelectedClass)) {
+	            return;
+	         }
+
+	         $self.addClass(tabSelectedClass).siblings().removeClass(tabSelectedClass);
+
+	         var index = $self.index();
+
+	         var $currentList = $element.find('.selectus__list').eq(index);
+
+	         $currentList.siblings().removeClass(listSelectedClass);
+
+	         $currentList.show();
+
+	         $currentList.height();
+
+	         $currentList.addClass(listSelectedClass);
+	      });
+
+	      (0, _jquery2.default)(document).on('transitionend webkitTransitionEnd  MSTransitionEnd', function (e) {
+
+	         var $self = (0, _jquery2.default)(e.target);
+
+	         // dropdown
+
+	         if ($self.is($dropdown)) {
+	            if (!$element.hasClass(dropdownOpenClass)) {
+	               $self.hide();
+	            }
+	         }
+
+	         // tabs
+	         if ($self.is('.selectus__list')) {
+	            if (!$self.hasClass(listSelectedClass)) {
+	               $self.hide();
+	            }
+	         }
 	      });
 	   }
 
-	   _createClass(Select3, [{
+	   _createClass(Selectus, [{
 	      key: 'prototypeMethod',
 	      value: function prototypeMethod() {
 	         return 'prototypeMethod';
@@ -132,32 +196,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	   }]);
 
-	   return Select3;
+	   return Selectus;
 	}();
 
-	Select3.DEFAULTS = {
+	Selectus.DEFAULTS = {
 	   offset: 100,
 	   speed: 500
 	};
 
-	plugin('select3', Select3);
+	plugin('selectus', Selectus);
 
-	exports.default = Select3;
+	exports.default = Selectus;
 
 /***/ },
 /* 1 */
 /***/ function(module, exports) {
 
-	// removed by extract-text-webpack-plugin
+	module.exports = __WEBPACK_EXTERNAL_MODULE_1__;
 
 /***/ },
-/* 2 */,
-/* 3 */,
-/* 4 */,
-/* 5 */
+/* 2 */
 /***/ function(module, exports) {
 
-	module.exports = __WEBPACK_EXTERNAL_MODULE_5__;
+	// removed by extract-text-webpack-plugin
 
 /***/ }
 /******/ ])

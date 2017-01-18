@@ -2,9 +2,13 @@ require('./main.styl');
 
 import $ from 'jquery';
 
+
+console.log('$', $);
+
 let plugin = (pluginName, className, shortHand = false) => {
    let dataName = `__${pluginName}`;
    let old = $.fn[pluginName];
+
 
    $.fn[pluginName] = function (option) {
       return this.each(function () {
@@ -31,14 +35,81 @@ let plugin = (pluginName, className, shortHand = false) => {
    $.fn[pluginName].noConflict = () => $.fn[pluginName] = old;
 }
 
-class Select3 {
+class Selectus {
 
    constructor(element, options) {
 
       const $element = $(element);
 
-      $('body').on('click', function () {
-         console.log(12345);
+      // dropdown
+
+      const $dropdown = $('.selectus__dropdown');
+
+      const dropdownOpenClass = 'selectus_dropdown-open';
+
+      $element.on('click', '.selectus__current-type', (e) => {
+         e.preventDefault();
+
+         if (!$element.hasClass(dropdownOpenClass)) {
+            $dropdown.show();
+         }
+
+         $element.toggleClass(dropdownOpenClass);
+      });
+
+      // tabs
+
+      const tabSelectedClass = 'selectus__tab_selected';
+      const listSelectedClass = 'selectus__list_selected';
+
+      $element.on('click', '.selectus__tab', (e) => {
+
+         e.preventDefault();
+
+         const $self = $(e.target);
+
+         if ($self.hasClass(tabSelectedClass)) {
+            return;
+         }
+
+         $self
+           .addClass(tabSelectedClass)
+           .siblings()
+           .removeClass(tabSelectedClass);
+
+         const index = $self.index();
+
+         const $currentList = $element.find('.selectus__list').eq(index);
+
+         $currentList.siblings().removeClass(listSelectedClass);
+
+         $currentList.show();
+
+         $currentList.height();
+
+         $currentList.addClass(listSelectedClass);
+
+      });
+
+      $(document).on('transitionend webkitTransitionEnd  MSTransitionEnd', (e) => {
+
+         const $self = $(e.target);
+
+         // dropdown
+
+         if ($self.is($dropdown)) {
+            if (!$element.hasClass(dropdownOpenClass)) {
+               $self.hide();
+            }
+         }
+
+         // tabs
+         if ($self.is('.selectus__list')) {
+            if (!$self.hasClass(listSelectedClass)) {
+               $self.hide();
+            }
+         }
+
       });
 
    }
@@ -53,11 +124,11 @@ class Select3 {
 
 }
 
-Select3.DEFAULTS = {
+Selectus.DEFAULTS = {
    offset: 100,
    speed: 500,
 };
 
-plugin('select3', Select3);
+plugin('selectus', Selectus);
 
-export default Select3;
+export default Selectus;

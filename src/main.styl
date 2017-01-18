@@ -1,24 +1,163 @@
-/* Reset default styles */
-html, body, div, h1, h2, h3, h4, h5, h6, p, blockquote, pre, img, ins, dl, dt, dd, ol, ul, li, form, label, table, tbody, tfoot, thead, tr, th, td
-   margin 0
-   padding 0
-   border 0
-   outline 0
-   background transparent
-input, textarea, select, button
-   margin 0
-   padding 0
-table
-   border-collapse collapse
-ol, ul, li
-   list-style none
-input[type="radio"]
-   width 13px
-   height 13px
-/* Global styles */
-
-
 .selectus
-   display: block
-
-
+   position: relative
+   font: 12px / 1.3 Trebuchet MS, Ubuntu, sans-serif;
+   color: #383c40
+   *
+      box-sizing border-box
+   &_dropdown-open
+      .selectus
+         &__
+            &dropdown
+               opacity 1
+            &current-type
+               &:before
+                  transform: rotate(180deg)
+   &__
+      &brief
+         display: flex
+         align-items: center;
+      &current
+         margin 0
+         &-type
+            position: relative
+            padding-left: 20px;
+            color: #6287a6
+            &:before
+               width: 14px
+               height: @width
+               position: absolute;
+               top: 50%
+               left: 0
+               margin-top: -((@width + 2) / 2)
+               font: bold 14px \/ @width FontAwesome;
+               text-align: center
+               content: '\f106';
+               -webkit-font-smoothing: antialiased;
+               -moz-osx-font-smoothing: grayscale
+               transition: transform .15s ease-out;
+      &selected
+         &-items
+            display: flex
+            align-items: center;
+         &-item
+            position: relative
+            margin: 0 4px;
+            padding: 0 22px 0 10px;
+            border: 1px solid #cacdd0
+            background-color: #f8f8f8
+            border-radius: 2px;
+            line-height: 24px
+            &-remove
+               width: 14px
+               height: @width
+               position: absolute
+               top: 50%
+               right: 4px
+               margin-top: -((@width + 2) / 2)
+               line-height: @width
+               text-align: center
+               color: #cacdd0
+               cursor: pointer
+      &more
+         border-bottom: 1px dotted #383c40
+         text-decoration: none
+         color: #383c40
+         &-wrap
+            padding-left: 5px
+      &dropdown
+         min-width: 200px
+         position: absolute
+         top: 35px;
+         left: 0
+         background-color: #fff;
+         border: 1px solid #cacdd0;
+         box-shadow: 1px 0 10px rgba(107, 116, 117, 0.25);
+         opacity: 0
+         transition: opacity .15s ease-out;
+      &head
+         display: flex
+         padding-top: 5px
+         background-color: #f4f4f4
+         font-size: 14px
+         font-weight: bold
+         line-height: 36px
+         white-space nowrap
+      &title
+         margin: 0 0 2px 15px
+         max-width: 150px
+         overflow: hidden
+         font-size: 14px;
+         text-overflow: ellipsis
+      &tabs
+         display: flex
+         margin: 0 5px
+      &tab
+         margin: 0 10px;
+         padding: 0 2px
+         text-decoration: none
+         border-bottom: 2px solid transparent
+         color: #383c40
+         &_selected
+            color: #53a87d
+            border-bottom-color #53a87d
+      &search
+         position: relative
+         margin-bottom: 6px;
+         &:before
+            width: 16px
+            height: @width
+            position: absolute
+            top: 50%
+            right: 12px;
+            margin-top: -((@width + 2) / 2)
+            font-size: 13px;
+            font: normal 14px \/ @width FontAwesome;
+            text-align: center
+            content: '\f002';
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale
+         &-input
+            width: 100%;
+            height: 30px
+            display: block
+            padding: 0
+            border: 1px solid #dbdddf;
+            border-radius: 2px;
+      &lists
+         position: relative
+      &list
+         width: 100%
+         position: absolute
+         top: 0
+         left: 0
+         padding: 8px 16px 16px
+         opacity: 0
+         transition: opacity .15s ease-out;
+         &_selected
+            position: static
+            opacity: 1
+      &items
+         display: flex
+         flex-direction column
+         align-items: flex-start;
+      &item
+         position: relative
+         margin: 6px 0
+         padding: 2px 0 2px 25px;
+         cursor: pointer
+         &:before
+            width: 16px
+            height: @width
+            position: absolute
+            left: 0
+            top: 50%
+            margin-top: -((@width + 2) / 2)
+            border: 1px solid #d4d7d9
+            font: normal 14px \/ @width FontAwesome;
+            text-align: center
+            color: #3f8964
+            content: '\f00c';
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale
+         &-wrap
+            display: block

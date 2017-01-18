@@ -14,71 +14,86 @@
 
 <script>
 
-//   $(function () {
-////      $('.select').test();
-////      $('.select').selectus();
-//   });
+   $(function () {
+      $('.selectus').selectus();
+   });
 
 </script>
 
 <div class="selectus">
-   Alliances (35):
 
-   <span class="selectus__item">
-      Vimpcom
-   </span>
+   <div class="selectus__brief">
 
-   <span class="selectus__item">
-      Avea
-   </span>
+      <p class="selectus__current">
+         <a href class="selectus__current-type">Alliances</a> (<span class="selectus__num">35</span>):
+      </p>
 
-   <span class="selectus__item">
-      Bite
-   </span>
+      <div class="selectus__selected-items">
 
-   ... <a href>and 3 more</a>
+         <span class="selectus__selected-item">
+            Vimpcom
+            <span class="selectus__selected-item-remove fa fa-times"></span>
+         </span>
+
+         <span class="selectus__selected-item">
+            Avea
+            <span class="selectus__selected-item-remove fa fa-times"></span>
+         </span>
+
+         <span class="selectus__selected-item">
+            Bite
+            <span class="selectus__selected-item-remove fa fa-times"></span>
+         </span>
+
+         <span class="selectus__more-wrap">
+            ... <a class="selectus__more" href>and 3 more</a>
+         </span>
+
+      </div>
+   </div>
 
    <div class="selectus__dropdown">
 
-      <div class="selectus__search fa fa-search">
-         <input class="selectus__search-input">
+      <div class="selectus__head">
+
+         <h3 class="selectus__title">Operators long long long</h3>
+
+         <div class="selectus__tabs">
+            <a class="selectus__tab selectus__tab_selected" href>Alliances</a>
+            <a class="selectus__tab" href>Countries</a>
+         </div>
+
       </div>
 
-      <p class="selectus__dropdown-item">
-         <span class="selectus__dropdown-item-wrap fa fa-times">
-            Select all (1 754)
-         </span>
-      </p>
+      <div class="selectus__lists">
+         <div class="selectus__list">
+            <div class="selectus__search">
+               <input class="selectus__search-input">
+            </div>
 
-      <p class="selectus__dropdown-item">
-         <span class="selectus__dropdown-item-wrap fa fa-times">
-            America Movil
-         </span>
-      </p>
+            <div class="selectus__items">
+               <p class="selectus__item">Select all (1 754)</p>
+               <p class="selectus__item">Select all (1 754)</p>
+               <p class="selectus__item">Select all (1 754)</p>
+               <p class="selectus__item">Select all (1 754)</p>
+               <p class="selectus__item">Select all (1 754)</p>
+            </div>
+         </div>
 
-      <p class="selectus__dropdown-item">
-         <span class="selectus__dropdown-item-wrap fa fa-times">
-            At&t
-         </span>
-      </p>
+         <div class="selectus__list selectus__list_selected">
+            <div class="selectus__search">
+               <input class="selectus__search-input">
+            </div>
 
-      <p class="selectus__dropdown-item">
-         <span class="selectus__dropdown-item-wrap fa fa-times">
-            Avea
-         </span>
-      </p>
-
-      <p class="selectus__dropdown-item">
-         <span class="selectus__dropdown-item-wrap fa fa-times">
-            Bite
-         </span>
-      </p>
-
-      <p class="selectus__dropdown-item">
-         <span class="selectus__dropdown-item-wrap fa fa-times">
-            Orange
-         </span>
-      </p>
+            <div class="selectus__items">
+               <p class="selectus__item">Select al (1 754)</p>
+               <p class="selectus__item">Selct all (1 754)</p>
+               <p class="selectus__item">Select all (1 754)</p>
+               <p class="selectus__item">Sct all (1 754)</p>
+               <p class="selectus__item">Select all (1 754)</p>
+            </div>
+         </div>
+      </div>
 
    </div>
 
