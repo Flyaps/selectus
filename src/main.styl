@@ -39,6 +39,7 @@
          &-items
             display: flex
             align-items: center;
+            padding: 0 5px;
          &-item
             position: relative
             margin: 0 4px;
@@ -58,12 +59,13 @@
                text-align: center
                color: #cacdd0
                cursor: pointer
-      &more
+      &more, &collapse
+         display: none
          border-bottom: 1px dotted #383c40
          text-decoration: none
          color: #383c40
-         &-wrap
-            padding-left: 5px
+         &_active
+            display: inline
       &dropdown
          min-width: 200px
          position: absolute
@@ -97,6 +99,7 @@
          text-decoration: none
          border-bottom: 2px solid transparent
          color: #383c40
+         transition: opacity .15s ease-out, border-bottom-color .15s ease-out;
          &_selected
             color: #53a87d
             border-bottom-color #53a87d

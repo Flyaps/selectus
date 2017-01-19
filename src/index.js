@@ -2,44 +2,13 @@ require('./main.styl');
 
 import $ from 'jquery';
 
-
-console.log('$', $);
-
-let plugin = (pluginName, className, shortHand = false) => {
-   let dataName = `__${pluginName}`;
-   let old = $.fn[pluginName];
-
-
-   $.fn[pluginName] = function (option) {
-      return this.each(function () {
-         let $this = $(this);
-         let data = $this.data(dataName);
-         let options = $.extend({}, className.DEFAULTS, $this.data(), typeof option === 'object' && option);
-
-         if (!data) {
-            $this.data(dataName, (data = new className(this, options)));
-         }
-
-         if (typeof option === 'string') {
-            data[option]();
-         }
-      });
-   };
-
-   // - Short hand
-   if (shortHand) {
-      $[pluginName] = (options) => $({})[pluginName](options);
-   }
-
-   // - No conflict
-   $.fn[pluginName].noConflict = () => $.fn[pluginName] = old;
-}
-
 class Selectus {
 
    constructor(element, options) {
 
       const $element = $(element);
+
+      $element.append(options.mainHTML)
 
       // dropdown
 
@@ -124,11 +93,55 @@ class Selectus {
 
 }
 
-Selectus.DEFAULTS = {
+Selectus.defaults = {
    offset: 100,
    speed: 500,
+   mainHTML: '<div class="selectus">\
+                 <div class="selectus__brief">\
+                    <p class="selectus__current">\
+                       <a href class="selectus__current-type"></a>\
+                       <span class="selectus__num-wrap">(<span class="selectus__num"></span>):</span>\
+                    </p>\
+                    <div class="selectus__selected-items"></div>\
+                    <a class="selectus__more" href></a>\
+                    <a class="selectus__collapse" href>collapse</a>\
+                 </div>\
+                 <div class="selectus__dropdown">\
+                    <div class="selectus__head">\
+                       <h3 class="selectus__title"></h3>\
+                       <div class="selectus__tabs"></div>\
+                    </div>\
+                    <div class="selectus__lists"></div>\
+                 </div>\
+             </div>'
 };
 
-plugin('selectus', Selectus);
+const pluginName = 'selectus'
+
+$.fn[pluginName] = function (option) {
+   return this.each((i, el) => {
+
+      console.log(arguments);
+
+      let $this = $(el);
+      let data = $this.data(`__${pluginName}`);
+
+      if (!data) {
+         let options = $.extend({}, $.fn[pluginName].defaults, typeof option === 'object' && option);
+
+         $this.data(`__${pluginName}`, (data = new Selectus(el, options)));
+      }
+
+      if (typeof option === 'string') {
+         data[option]();
+      }
+
+   });
+};
+
+$.fn[pluginName].defaults = Selectus.defaults;
+
+// - No conflict
+$.fn[pluginName].noConflict = () => $.fn[pluginName] = old;
 
 export default Selectus;

@@ -60,9 +60,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	   value: true
 	});
 
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 	var _jquery = __webpack_require__(1);
 
@@ -74,48 +74,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	__webpack_require__(2);
 
-	console.log('$', _jquery2.default);
-
-	var plugin = function plugin(pluginName, className) {
-	   var shortHand = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-
-	   var dataName = '__' + pluginName;
-	   var old = _jquery2.default.fn[pluginName];
-
-	   _jquery2.default.fn[pluginName] = function (option) {
-	      return this.each(function () {
-	         var $this = (0, _jquery2.default)(this);
-	         var data = $this.data(dataName);
-	         var options = _jquery2.default.extend({}, className.DEFAULTS, $this.data(), (typeof option === 'undefined' ? 'undefined' : _typeof(option)) === 'object' && option);
-
-	         if (!data) {
-	            $this.data(dataName, data = new className(this, options));
-	         }
-
-	         if (typeof option === 'string') {
-	            data[option]();
-	         }
-	      });
-	   };
-
-	   // - Short hand
-	   if (shortHand) {
-	      _jquery2.default[pluginName] = function (options) {
-	         return (0, _jquery2.default)({})[pluginName](options);
-	      };
-	   }
-
-	   // - No conflict
-	   _jquery2.default.fn[pluginName].noConflict = function () {
-	      return _jquery2.default.fn[pluginName] = old;
-	   };
-	};
-
 	var Selectus = function () {
 	   function Selectus(element, options) {
 	      _classCallCheck(this, Selectus);
 
 	      var $element = (0, _jquery2.default)(element);
+
+	      $element.append(options.mainHTML);
 
 	      // dropdown
 
@@ -199,12 +164,59 @@ return /******/ (function(modules) { // webpackBootstrap
 	   return Selectus;
 	}();
 
-	Selectus.DEFAULTS = {
+	Selectus.defaults = {
 	   offset: 100,
-	   speed: 500
+	   speed: 500,
+	   mainHTML: '<div class="selectus">\
+	                 <div class="selectus__brief">\
+	                    <p class="selectus__current">\
+	                       <a href class="selectus__current-type"></a>\
+	                       <span class="selectus__num-wrap">(<span class="selectus__num"></span>):</span>\
+	                    </p>\
+	                    <div class="selectus__selected-items"></div>\
+	                    <a class="selectus__more" href></a>\
+	                    <a class="selectus__collapse" href>collapse</a>\
+	                 </div>\
+	                 <div class="selectus__dropdown">\
+	                    <div class="selectus__head">\
+	                       <h3 class="selectus__title"></h3>\
+	                       <div class="selectus__tabs"></div>\
+	                    </div>\
+	                    <div class="selectus__lists"></div>\
+	                 </div>\
+	             </div>'
 	};
 
-	plugin('selectus', Selectus);
+	var pluginName = 'selectus';
+
+	_jquery2.default.fn[pluginName] = function (option) {
+	   var _arguments = arguments;
+
+	   return this.each(function (i, el) {
+
+	      console.log(_arguments);
+
+	      var $this = (0, _jquery2.default)(el);
+	      var data = $this.data('__' + pluginName);
+
+	      if (!data) {
+	         var options = _jquery2.default.extend({}, _jquery2.default.fn[pluginName].defaults, (typeof option === 'undefined' ? 'undefined' : _typeof(option)) === 'object' && option);
+
+	         $this.data('__' + pluginName, data = new Selectus(el, options));
+	      }
+
+	      if (typeof option === 'string') {
+	         data[option]();
+	      }
+	   });
+	};
+
+	_jquery2.default.fn[pluginName].defaults = Selectus.defaults;
+
+	// - No conflict
+	_jquery2.default.fn[pluginName].noConflict = function () {
+	   return _jquery2.default.fn[pluginName] = old;
+	};
 
 	exports.default = Selectus;
 

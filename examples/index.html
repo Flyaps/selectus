@@ -15,7 +15,11 @@
 <script>
 
    $(function () {
-      $('.selectus').selectus();
+      $('.test').selectus();
+
+
+
+
    });
 
 </script>
@@ -45,11 +49,20 @@
             <span class="selectus__selected-item-remove fa fa-times"></span>
          </span>
 
-         <span class="selectus__more-wrap">
-            ... <a class="selectus__more" href>and 3 more</a>
+         <span class="selectus__selected-item">
+            Bite
+            <span class="selectus__selected-item-remove fa fa-times"></span>
+         </span>
+
+         <span class="selectus__selected-item">
+            Bite
+            <span class="selectus__selected-item-remove fa fa-times"></span>
          </span>
 
       </div>
+
+      <a class="selectus__more selectus__more_active" href>and 3 more</a>
+      <a class="selectus__collapse" href>collapse</a>
    </div>
 
    <div class="selectus__dropdown">
@@ -98,6 +111,10 @@
    </div>
 
 </div>
+
+<div class="test"></div>
+
+<div class="test1" data-plugin-options="1" data-plugin-1="2" data-plugin-2="3"></div>
 
 </body>
 </html>
