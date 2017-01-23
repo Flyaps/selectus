@@ -14,10 +14,12 @@
                   transform: rotate(180deg)
    &__
       &brief
+         min-height: 30px;
          display: flex
          align-items: center;
       &current
          margin 0
+         white-space: nowrap;
          &-type
             position: relative
             padding-left: 20px;
@@ -38,11 +40,12 @@
       &selected
          &-items
             display: flex
+            flex-wrap: wrap;
             align-items: center;
-            padding: 0 5px;
+            padding-left: 5px;
          &-item
             position: relative
-            margin: 0 4px;
+            margin: 2px 4px;
             padding: 0 22px 0 10px;
             border: 1px solid #cacdd0
             background-color: #f8f8f8
@@ -123,7 +126,7 @@
             width: 100%;
             height: 30px
             display: block
-            padding: 0
+            padding: 0 30px 0 5px;
             border: 1px solid #dbdddf;
             border-radius: 2px;
       &lists
@@ -133,20 +136,26 @@
          position: absolute
          top: 0
          left: 0
-         padding: 8px 16px 16px
+         padding: 8px 16px 0
          opacity: 0
          transition: opacity .15s ease-out;
          &_selected
             position: static
             opacity: 1
       &items
+         max-height: 310px
+         overflow-y: auto
          display: flex
          flex-direction column
-         align-items: flex-start;
+         align-items: flex-start
+         margin-right: -16px;
+         padding-right: 16px;
+         padding-bottom: 16px
       &item
          position: relative
          margin: 6px 0
          padding: 2px 0 2px 25px;
+         line-height: 15px;
          cursor: pointer
          &:before
             width: 16px
@@ -159,8 +168,9 @@
             font: normal 14px \/ @width FontAwesome;
             text-align: center
             color: #3f8964
-            content: '\f00c';
+            content: '';
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale
-         &-wrap
-            display: block
+         &_selected
+            &:before
+               content: '\f00c'

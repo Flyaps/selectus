@@ -74,34 +74,76 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	__webpack_require__(2);
 
+	var selectedItemClass = 'selectus__selected-item';
+	var dropdownOpenClass = 'selectus_dropdown-open';
+	var tabSelectedClass = 'selectus__tab_selected';
+	var listSelectedClass = 'selectus__list_selected';
+	var itemSelectedClass = 'selectus__item_selected';
+
 	var Selectus = function () {
 	   function Selectus(element, options) {
 	      _classCallCheck(this, Selectus);
 
+	      var self = this;
+
+	      self.options = options;
+
 	      var $element = (0, _jquery2.default)(element);
 
-	      $element.append(options.mainHTML);
+	      var $input = void 0;
+
+	      if ($element.is('input[type="hidden"]')) {
+
+	         $input = $element;
+
+	         $element = (0, _jquery2.default)('<div class="selectus">' + options.mainHTML + '<div>');
+
+	         $input.before($element);
+
+	         $element.append($input);
+	      } else {
+
+	         $element.addClass('selectus').append(options.mainHTML);
+
+	         $input = (0, _jquery2.default)('<input type="hidden">');
+
+	         $element.append($input);
+	      }
+
+	      self.elements = {
+	         $element: $element,
+	         $window: (0, _jquery2.default)(window),
+	         $selectedItems: $element.find('.selectus__selected-items'),
+	         $dropdown: $element.find('.selectus__dropdown'),
+	         $title: $element.find('.selectus__title'),
+	         $currentType: $element.find('.selectus__current-type'),
+	         $tabs: $element.find('.selectus__tabs'),
+	         $lists: $element.find('.selectus__lists'),
+	         $input: $input
+	      };
+
+	      var _self$elements = self.elements,
+	          $dropdown = _self$elements.$dropdown,
+	          $window = _self$elements.$window;
+
+
+	      self.updateHTMLData();
 
 	      // dropdown
-
-	      var $dropdown = (0, _jquery2.default)('.selectus__dropdown');
-
-	      var dropdownOpenClass = 'selectus_dropdown-open';
 
 	      $element.on('click', '.selectus__current-type', function (e) {
 	         e.preventDefault();
 
-	         if (!$element.hasClass(dropdownOpenClass)) {
-	            $dropdown.show();
-	         }
+	         if ($element.hasClass(dropdownOpenClass)) {
 
-	         $element.toggleClass(dropdownOpenClass);
+	            self.hideDropdown();
+	         } else {
+
+	            self.showDropdown();
+	         }
 	      });
 
 	      // tabs
-
-	      var tabSelectedClass = 'selectus__tab_selected';
-	      var listSelectedClass = 'selectus__list_selected';
 
 	      $element.on('click', '.selectus__tab', function (e) {
 
@@ -126,9 +168,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	         $currentList.height();
 
 	         $currentList.addClass(listSelectedClass);
+
+	         self.setSelectedItemsOfCurrentTab();
 	      });
 
-	      (0, _jquery2.default)(document).on('transitionend webkitTransitionEnd  MSTransitionEnd', function (e) {
+	      $element.on('click', '.selectus__item', function (e) {
+
+	         var $self = (0, _jquery2.default)(e.currentTarget);
+
+	         $self.toggleClass(itemSelectedClass);
+
+	         if ($self.hasClass(itemSelectedClass)) {
+	            self.addSelectedItem($self.data('id'), _jquery2.default.trim($self.html()));
+	         } else {
+	            self.removeSelectedItem($self.data('id'));
+	         }
+	      });
+
+	      $element.on('click', '.selectus__selected-item-remove', function (e) {
+
+	         setTimeout(function () {
+	            var $item = (0, _jquery2.default)(e.currentTarget).parent();
+
+	            self.removeSelectedItem($item.data('id'));
+	         });
+	      });
+
+	      $window.on('transitionend webkitTransitionEnd  MSTransitionEnd', function (e) {
 
 	         var $self = (0, _jquery2.default)(e.target);
 
@@ -141,23 +207,177 @@ return /******/ (function(modules) { // webpackBootstrap
 	         }
 
 	         // tabs
+
 	         if ($self.is('.selectus__list')) {
 	            if (!$self.hasClass(listSelectedClass)) {
 	               $self.hide();
 	            }
 	         }
 	      });
+
+	      $window.on('click', function (e) {
+
+	         if (!(0, _jquery2.default)(e.target).closest($element).length) {
+	            console.log('hideDropdown');
+
+	            self.hideDropdown();
+	         }
+	      });
 	   }
 
 	   _createClass(Selectus, [{
-	      key: 'prototypeMethod',
-	      value: function prototypeMethod() {
-	         return 'prototypeMethod';
+	      key: 'setValuesToInput',
+	      value: function setValuesToInput() {
+	         var _elements = this.elements,
+	             $lists = _elements.$lists,
+	             $input = _elements.$input;
+
+
+	         var value = $lists.find('.' + listSelectedClass + ' .' + itemSelectedClass).map(function (i, el) {
+	            return (0, _jquery2.default)(el).data('id');
+	         }).get().join(',');
+
+	         $input.val(value);
 	      }
-	   }], [{
-	      key: 'staticMethod',
-	      value: function staticMethod() {
-	         return 'staticMethod';
+	   }, {
+	      key: 'addSelectedItem',
+	      value: function addSelectedItem(id, name) {
+	         var $selectedItems = this.elements.$selectedItems;
+
+
+	         if ($selectedItems.find('.' + selectedItemClass + '[data-id="' + id + '"]').length) {
+	            return;
+	         }
+
+	         var $item = '<span class="selectus__selected-item" data-id="' + id + '">' + name + '<span class="selectus__selected-item-remove fa fa-times"></span></span>';
+
+	         $selectedItems.append($item);
+
+	         this.setValuesToInput();
+	      }
+	   }, {
+	      key: 'removeSelectedItem',
+	      value: function removeSelectedItem(id) {
+	         var _elements2 = this.elements,
+	             $selectedItems = _elements2.$selectedItems,
+	             $lists = _elements2.$lists;
+
+
+	         var $item = $selectedItems.find('.' + selectedItemClass + '[data-id="' + id + '"]');
+
+	         if (!$item.length) {
+	            return;
+	         }
+
+	         $item.remove();
+
+	         $lists.find('.' + listSelectedClass + ' .' + itemSelectedClass + '[data-id="' + id + '"]').removeClass(itemSelectedClass);
+
+	         this.setValuesToInput();
+	      }
+	   }, {
+	      key: 'setSelectedItemsOfCurrentTab',
+	      value: function setSelectedItemsOfCurrentTab() {
+
+	         var self = this;
+
+	         var _elements3 = this.elements,
+	             $selectedItems = _elements3.$selectedItems,
+	             $lists = _elements3.$lists;
+
+
+	         $selectedItems.empty();
+
+	         $lists.find('.' + listSelectedClass + ' .' + itemSelectedClass).each(function (i, item) {
+
+	            var $item = (0, _jquery2.default)(item);
+
+	            self.addSelectedItem($item.data('id'), _jquery2.default.trim($item.html()));
+	         });
+
+	         this.setValuesToInput();
+	      }
+	   }, {
+	      key: 'showDropdown',
+	      value: function showDropdown() {
+	         var _elements4 = this.elements,
+	             $element = _elements4.$element,
+	             $dropdown = _elements4.$dropdown;
+
+
+	         if ($element.hasClass(dropdownOpenClass)) {
+	            return;
+	         }
+
+	         $dropdown.show();
+
+	         $element.addClass(dropdownOpenClass);
+	      }
+	   }, {
+	      key: 'hideDropdown',
+	      value: function hideDropdown() {
+	         var $element = this.elements.$element;
+
+
+	         if (!$element.hasClass(dropdownOpenClass)) {
+	            return;
+	         }
+
+	         $element.removeClass(dropdownOpenClass);
+	      }
+	   }, {
+	      key: 'updateHTMLData',
+	      value: function updateHTMLData() {
+	         var options = this.options,
+	             _elements5 = this.elements,
+	             $element = _elements5.$element,
+	             $title = _elements5.$title,
+	             $currentType = _elements5.$currentType,
+	             $tabs = _elements5.$tabs,
+	             $lists = _elements5.$lists;
+
+
+	         $title.html(options.typesName);
+
+	         $currentType.html(options.data[0].name);
+
+	         options.data.forEach(function (o, i) {
+
+	            var $tab = (0, _jquery2.default)('<a class="selectus__tab" href>' + o.name + '</a>');
+
+	            var $list = (0, _jquery2.default)('<div class="selectus__list" style="display: none;">\
+	                             <div class="selectus__search">\
+	                                <input class="selectus__search-input">\
+	                             </div>\
+	                             <div class="selectus__items"></div>\
+	                          </div>');
+
+	            if (i === 0) {
+
+	               $tab.addClass('selectus__tab_selected');
+
+	               $list.addClass('selectus__list_selected').removeAttr('style');
+	            }
+
+	            $tabs.append($tab);
+
+	            $lists.append($list);
+
+	            var $items = $list.find('.selectus__items');
+
+	            o.items.forEach(function (item) {
+
+	               $items.append('<p class="selectus__item" data-id="' + item.id + '">' + item.name + '</p>');
+	            });
+	         });
+	      }
+	   }, {
+	      key: 'val',
+	      value: function val() {
+	         var $input = this.elements.$input;
+
+
+	         return $input.val();
 	      }
 	   }]);
 
@@ -167,34 +387,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	Selectus.defaults = {
 	   offset: 100,
 	   speed: 500,
-	   mainHTML: '<div class="selectus">\
-	                 <div class="selectus__brief">\
-	                    <p class="selectus__current">\
-	                       <a href class="selectus__current-type"></a>\
-	                       <span class="selectus__num-wrap">(<span class="selectus__num"></span>):</span>\
-	                    </p>\
-	                    <div class="selectus__selected-items"></div>\
-	                    <a class="selectus__more" href></a>\
-	                    <a class="selectus__collapse" href>collapse</a>\
+	   mainHTML: '<div class="selectus__brief">\
+	                 <p class="selectus__current">\
+	                    <a href class="selectus__current-type"></a>\
+	                    <span class="selectus__num-wrap">(<span class="selectus__num"></span>):</span>\
+	                 </p>\
+	                 <div class="selectus__selected-items"></div>\
+	                 <a class="selectus__more" href></a>\
+	                 <a class="selectus__collapse" href>collapse</a>\
+	              </div>\
+	              <div class="selectus__dropdown">\
+	                 <div class="selectus__head">\
+	                    <h3 class="selectus__title"></h3>\
+	                    <div class="selectus__tabs"></div>\
 	                 </div>\
-	                 <div class="selectus__dropdown">\
-	                    <div class="selectus__head">\
-	                       <h3 class="selectus__title"></h3>\
-	                       <div class="selectus__tabs"></div>\
-	                    </div>\
-	                    <div class="selectus__lists"></div>\
-	                 </div>\
-	             </div>'
+	                 <div class="selectus__lists"></div>\
+	              </div>'
 	};
 
 	var pluginName = 'selectus';
 
 	_jquery2.default.fn[pluginName] = function (option) {
-	   var _arguments = arguments;
-
 	   return this.each(function (i, el) {
 
-	      console.log(_arguments);
+	      console.log(typeof option === 'undefined' ? 'undefined' : _typeof(option));
 
 	      var $this = (0, _jquery2.default)(el);
 	      var data = $this.data('__' + pluginName);

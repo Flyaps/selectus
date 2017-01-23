@@ -15,9 +15,81 @@
 <script>
 
    $(function () {
-      $('.test').selectus();
-
-
+      $('.test').selectus({
+         typesName: 'Operators',
+         data: [
+            {
+               name: 'Operator 1',
+               items: [
+                  {
+                     id: 1,
+                     name: '123'
+                  },
+                  {
+                     id: 2,
+                     name: '1234'
+                  },
+                  {
+                     id: 3,
+                     name: '12345'
+                  },
+                  {
+                     id: 4,
+                     name: '12345'
+                  },
+                  {
+                     id: 5,
+                     name: '123456345345 34535345 345sdafasdf sdfasdf asdfasd'
+                  },
+                  {
+                     id: 6,
+                     name: '123456435345'
+                  },
+                  {
+                     id: 7,
+                     name: '1234565345345'
+                  },
+                  {
+                     id: 8,
+                     name: '1234565345'
+                  },
+                  {
+                     id: 9,
+                     name: '1234567345345'
+                  },
+                  {
+                     id: 10,
+                     name: '12345677645345345'
+                  },
+                  {
+                     id: 11,
+                     name: '12345'
+                  },
+                  {
+                     id: 12,
+                     name: '12345'
+                  }
+               ]
+            },
+            {
+               name: 'Operator 2',
+               items: [
+                  {
+                     id: 1,
+                     name: '456'
+                  },
+                  {
+                     id: 2,
+                     name: '567'
+                  },
+                  {
+                     id: 3,
+                     name: '6789'
+                  }
+               ]
+            }
+         ]
+      });
 
 
    });
@@ -113,8 +185,6 @@
 </div>
 
 <div class="test"></div>
-
-<div class="test1" data-plugin-options="1" data-plugin-1="2" data-plugin-2="3"></div>
 
 </body>
 </html>
