@@ -88,6 +88,7 @@ module.exports = {
             loader: 'babel',
             exclude: /node_modules/,
             query: {
+               plugins: ['lodash'],
                presets: ['es2015']
             }
          },

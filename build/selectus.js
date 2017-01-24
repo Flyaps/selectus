@@ -7,7 +7,7 @@
 		exports["selectus"] = factory(require("jquery"));
 	else
 		root["selectus"] = factory(root["jQuery"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_1__) {
+})(this, function(__WEBPACK_EXTERNAL_MODULE_15__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -60,11 +60,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	   value: true
 	});
 
+	var _debounce2 = __webpack_require__(20);
+
+	var _debounce3 = _interopRequireDefault(_debounce2);
+
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _jquery = __webpack_require__(1);
+	var _jquery = __webpack_require__(15);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
@@ -72,13 +76,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	__webpack_require__(2);
+	__webpack_require__(16);
 
 	var selectedItemClass = 'selectus__selected-item';
 	var dropdownOpenClass = 'selectus_dropdown-open';
 	var tabSelectedClass = 'selectus__tab_selected';
 	var listSelectedClass = 'selectus__list_selected';
 	var itemSelectedClass = 'selectus__item_selected';
+	var manySelectedItemsExpandClass = 'selectus_many-selected-items_expand';
 
 	var Selectus = function () {
 	   function Selectus(element, options) {
@@ -116,6 +121,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	         $selectedItems: $element.find('.selectus__selected-items'),
 	         $dropdown: $element.find('.selectus__dropdown'),
 	         $title: $element.find('.selectus__title'),
+	         $numWrap: $element.find('.selectus__num-wrap'),
+	         $num: $element.find('.selectus__num'),
 	         $currentType: $element.find('.selectus__current-type'),
 	         $tabs: $element.find('.selectus__tabs'),
 	         $lists: $element.find('.selectus__lists'),
@@ -123,8 +130,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      };
 
 	      var _self$elements = self.elements,
+	          $window = _self$elements.$window,
 	          $dropdown = _self$elements.$dropdown,
-	          $window = _self$elements.$window;
+	          $currentType = _self$elements.$currentType;
 
 
 	      self.updateHTMLData();
@@ -159,15 +167,17 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	         var index = $self.index();
 
-	         var $currentList = $element.find('.selectus__list').eq(index);
+	         $currentType.html($self.html());
 
-	         $currentList.siblings().removeClass(listSelectedClass);
+	         var $list = $element.find('.selectus__list').eq(index);
 
-	         $currentList.show();
+	         $list.siblings().removeClass(listSelectedClass);
 
-	         $currentList.height();
+	         $list.show();
 
-	         $currentList.addClass(listSelectedClass);
+	         $list.height();
+
+	         $list.addClass(listSelectedClass);
 
 	         self.setSelectedItemsOfCurrentTab();
 	      });
@@ -183,6 +193,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	         } else {
 	            self.removeSelectedItem($self.data('id'));
 	         }
+
+	         self.setNumSelectedItems();
 	      });
 
 	      $element.on('click', '.selectus__selected-item-remove', function (e) {
@@ -191,7 +203,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var $item = (0, _jquery2.default)(e.currentTarget).parent();
 
 	            self.removeSelectedItem($item.data('id'));
+
+	            self.setNumSelectedItems();
 	         });
+	      });
+
+	      $element.on('click', '.selectus__expand', function (e) {
+
+	         e.preventDefault();
+
+	         $element.addClass(manySelectedItemsExpandClass);
+	      });
+
+	      $element.on('click', '.selectus__collapse', function (e) {
+
+	         e.preventDefault();
+
+	         $element.removeClass(manySelectedItemsExpandClass);
 	      });
 
 	      $window.on('transitionend webkitTransitionEnd  MSTransitionEnd', function (e) {
@@ -218,11 +246,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	      $window.on('click', function (e) {
 
 	         if (!(0, _jquery2.default)(e.target).closest($element).length) {
-	            console.log('hideDropdown');
 
 	            self.hideDropdown();
 	         }
 	      });
+
+	      $window.on('resize', (0, _debounce3.default)(self.updateSelectedItemsWidth.bind(self), 150));
 	   }
 
 	   _createClass(Selectus, [{
@@ -276,14 +305,37 @@ return /******/ (function(modules) { // webpackBootstrap
 	         this.setValuesToInput();
 	      }
 	   }, {
+	      key: 'setNumSelectedItems',
+	      value: function setNumSelectedItems() {
+	         var _elements3 = this.elements,
+	             $numWrap = _elements3.$numWrap,
+	             $num = _elements3.$num,
+	             $lists = _elements3.$lists;
+
+
+	         var num = $lists.find('.' + listSelectedClass + ' .' + itemSelectedClass).length;
+
+	         if (num) {
+
+	            $num.html('' + num);
+
+	            $numWrap.show();
+	         } else {
+
+	            $num.html('');
+
+	            $numWrap.hide();
+	         }
+	      }
+	   }, {
 	      key: 'setSelectedItemsOfCurrentTab',
 	      value: function setSelectedItemsOfCurrentTab() {
 
 	         var self = this;
 
-	         var _elements3 = this.elements,
-	             $selectedItems = _elements3.$selectedItems,
-	             $lists = _elements3.$lists;
+	         var _elements4 = this.elements,
+	             $selectedItems = _elements4.$selectedItems,
+	             $lists = _elements4.$lists;
 
 
 	         $selectedItems.empty();
@@ -296,13 +348,37 @@ return /******/ (function(modules) { // webpackBootstrap
 	         });
 
 	         this.setValuesToInput();
+
+	         this.setNumSelectedItems();
+	      }
+	   }, {
+	      key: 'updateSelectedItemsWidth',
+	      value: function updateSelectedItemsWidth() {
+	         var _elements5 = this.elements,
+	             $element = _elements5.$element,
+	             $selectedItems = _elements5.$selectedItems;
+
+
+	         var rightВorderSelectusPosition = $element.offset().left + $element.innerWidth();
+
+	         var $item = $selectedItems.find('.selectus__selected-item:last-child');
+
+	         var rightВorderSelectedLastItemPosition = $item.offset().left + $item.innerWidth() + 1;
+
+	         if (rightВorderSelectedLastItemPosition > rightВorderSelectusPosition) {
+
+	            $element.addClass('selectus_many-selected-items');
+	         } else {
+
+	            $element.removeClass('selectus_many-selected-items');
+	         }
 	      }
 	   }, {
 	      key: 'showDropdown',
 	      value: function showDropdown() {
-	         var _elements4 = this.elements,
-	             $element = _elements4.$element,
-	             $dropdown = _elements4.$dropdown;
+	         var _elements6 = this.elements,
+	             $element = _elements6.$element,
+	             $dropdown = _elements6.$dropdown;
 
 
 	         if ($element.hasClass(dropdownOpenClass)) {
@@ -329,12 +405,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	      key: 'updateHTMLData',
 	      value: function updateHTMLData() {
 	         var options = this.options,
-	             _elements5 = this.elements,
-	             $element = _elements5.$element,
-	             $title = _elements5.$title,
-	             $currentType = _elements5.$currentType,
-	             $tabs = _elements5.$tabs,
-	             $lists = _elements5.$lists;
+	             _elements7 = this.elements,
+	             $title = _elements7.$title,
+	             $currentType = _elements7.$currentType,
+	             $tabs = _elements7.$tabs,
+	             $lists = _elements7.$lists;
 
 
 	         $title.html(options.typesName);
@@ -367,9 +442,17 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            o.items.forEach(function (item) {
 
-	               $items.append('<p class="selectus__item" data-id="' + item.id + '">' + item.name + '</p>');
+	               var additionalClass = '';
+
+	               if (item.selected) {
+	                  additionalClass = ' ' + itemSelectedClass;
+	               }
+
+	               $items.append('<p class="selectus__item' + additionalClass + '" data-id="' + item.id + '">' + item.name + '</p>');
 	            });
 	         });
+
+	         this.setSelectedItemsOfCurrentTab();
 	      }
 	   }, {
 	      key: 'val',
@@ -390,10 +473,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	   mainHTML: '<div class="selectus__brief">\
 	                 <p class="selectus__current">\
 	                    <a href class="selectus__current-type"></a>\
-	                    <span class="selectus__num-wrap">(<span class="selectus__num"></span>):</span>\
+	                    <span class="selectus__num-wrap" style="display: none;">(<span class="selectus__num"></span>):</span>\
 	                 </p>\
 	                 <div class="selectus__selected-items"></div>\
-	                 <a class="selectus__more" href></a>\
+	                 <a class="selectus__expand" href>expand</a>\
 	                 <a class="selectus__collapse" href>collapse</a>\
 	              </div>\
 	              <div class="selectus__dropdown">\
@@ -437,16 +520,579 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Selectus;
 
 /***/ },
-/* 1 */
-/***/ function(module, exports) {
+/* 1 */,
+/* 2 */,
+/* 3 */,
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __WEBPACK_EXTERNAL_MODULE_1__;
+	var baseGetTag = __webpack_require__(5),
+	    isObjectLike = __webpack_require__(11);
+
+	/** `Object#toString` result references. */
+	var symbolTag = '[object Symbol]';
+
+	/**
+	 * Checks if `value` is classified as a `Symbol` primitive or object.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 4.0.0
+	 * @category Lang
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is a symbol, else `false`.
+	 * @example
+	 *
+	 * _.isSymbol(Symbol.iterator);
+	 * // => true
+	 *
+	 * _.isSymbol('abc');
+	 * // => false
+	 */
+	function isSymbol(value) {
+	  return typeof value == 'symbol' ||
+	    (isObjectLike(value) && baseGetTag(value) == symbolTag);
+	}
+
+	module.exports = isSymbol;
+
 
 /***/ },
-/* 2 */
+/* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Symbol = __webpack_require__(6),
+	    getRawTag = __webpack_require__(9),
+	    objectToString = __webpack_require__(10);
+
+	/** `Object#toString` result references. */
+	var nullTag = '[object Null]',
+	    undefinedTag = '[object Undefined]';
+
+	/** Built-in value references. */
+	var symToStringTag = Symbol ? Symbol.toStringTag : undefined;
+
+	/**
+	 * The base implementation of `getTag` without fallbacks for buggy environments.
+	 *
+	 * @private
+	 * @param {*} value The value to query.
+	 * @returns {string} Returns the `toStringTag`.
+	 */
+	function baseGetTag(value) {
+	  if (value == null) {
+	    return value === undefined ? undefinedTag : nullTag;
+	  }
+	  return (symToStringTag && symToStringTag in Object(value))
+	    ? getRawTag(value)
+	    : objectToString(value);
+	}
+
+	module.exports = baseGetTag;
+
+
+/***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var root = __webpack_require__(7);
+
+	/** Built-in value references. */
+	var Symbol = root.Symbol;
+
+	module.exports = Symbol;
+
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var freeGlobal = __webpack_require__(8);
+
+	/** Detect free variable `self`. */
+	var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
+
+	/** Used as a reference to the global object. */
+	var root = freeGlobal || freeSelf || Function('return this')();
+
+	module.exports = root;
+
+
+/***/ },
+/* 8 */
+/***/ function(module, exports) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {/** Detect free variable `global` from Node.js. */
+	var freeGlobal = typeof global == 'object' && global && global.Object === Object && global;
+
+	module.exports = freeGlobal;
+
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Symbol = __webpack_require__(6);
+
+	/** Used for built-in method references. */
+	var objectProto = Object.prototype;
+
+	/** Used to check objects for own properties. */
+	var hasOwnProperty = objectProto.hasOwnProperty;
+
+	/**
+	 * Used to resolve the
+	 * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
+	 * of values.
+	 */
+	var nativeObjectToString = objectProto.toString;
+
+	/** Built-in value references. */
+	var symToStringTag = Symbol ? Symbol.toStringTag : undefined;
+
+	/**
+	 * A specialized version of `baseGetTag` which ignores `Symbol.toStringTag` values.
+	 *
+	 * @private
+	 * @param {*} value The value to query.
+	 * @returns {string} Returns the raw `toStringTag`.
+	 */
+	function getRawTag(value) {
+	  var isOwn = hasOwnProperty.call(value, symToStringTag),
+	      tag = value[symToStringTag];
+
+	  try {
+	    value[symToStringTag] = undefined;
+	    var unmasked = true;
+	  } catch (e) {}
+
+	  var result = nativeObjectToString.call(value);
+	  if (unmasked) {
+	    if (isOwn) {
+	      value[symToStringTag] = tag;
+	    } else {
+	      delete value[symToStringTag];
+	    }
+	  }
+	  return result;
+	}
+
+	module.exports = getRawTag;
+
+
+/***/ },
+/* 10 */
+/***/ function(module, exports) {
+
+	/** Used for built-in method references. */
+	var objectProto = Object.prototype;
+
+	/**
+	 * Used to resolve the
+	 * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
+	 * of values.
+	 */
+	var nativeObjectToString = objectProto.toString;
+
+	/**
+	 * Converts `value` to a string using `Object.prototype.toString`.
+	 *
+	 * @private
+	 * @param {*} value The value to convert.
+	 * @returns {string} Returns the converted string.
+	 */
+	function objectToString(value) {
+	  return nativeObjectToString.call(value);
+	}
+
+	module.exports = objectToString;
+
+
+/***/ },
+/* 11 */
+/***/ function(module, exports) {
+
+	/**
+	 * Checks if `value` is object-like. A value is object-like if it's not `null`
+	 * and has a `typeof` result of "object".
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 4.0.0
+	 * @category Lang
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
+	 * @example
+	 *
+	 * _.isObjectLike({});
+	 * // => true
+	 *
+	 * _.isObjectLike([1, 2, 3]);
+	 * // => true
+	 *
+	 * _.isObjectLike(_.noop);
+	 * // => false
+	 *
+	 * _.isObjectLike(null);
+	 * // => false
+	 */
+	function isObjectLike(value) {
+	  return value != null && typeof value == 'object';
+	}
+
+	module.exports = isObjectLike;
+
+
+/***/ },
+/* 12 */,
+/* 13 */,
+/* 14 */,
+/* 15 */
+/***/ function(module, exports) {
+
+	module.exports = __WEBPACK_EXTERNAL_MODULE_15__;
+
+/***/ },
+/* 16 */
 /***/ function(module, exports) {
 
 	// removed by extract-text-webpack-plugin
+
+/***/ },
+/* 17 */,
+/* 18 */,
+/* 19 */,
+/* 20 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var isObject = __webpack_require__(21),
+	    now = __webpack_require__(22),
+	    toNumber = __webpack_require__(23);
+
+	/** Error message constants. */
+	var FUNC_ERROR_TEXT = 'Expected a function';
+
+	/* Built-in method references for those with the same name as other `lodash` methods. */
+	var nativeMax = Math.max,
+	    nativeMin = Math.min;
+
+	/**
+	 * Creates a debounced function that delays invoking `func` until after `wait`
+	 * milliseconds have elapsed since the last time the debounced function was
+	 * invoked. The debounced function comes with a `cancel` method to cancel
+	 * delayed `func` invocations and a `flush` method to immediately invoke them.
+	 * Provide `options` to indicate whether `func` should be invoked on the
+	 * leading and/or trailing edge of the `wait` timeout. The `func` is invoked
+	 * with the last arguments provided to the debounced function. Subsequent
+	 * calls to the debounced function return the result of the last `func`
+	 * invocation.
+	 *
+	 * **Note:** If `leading` and `trailing` options are `true`, `func` is
+	 * invoked on the trailing edge of the timeout only if the debounced function
+	 * is invoked more than once during the `wait` timeout.
+	 *
+	 * If `wait` is `0` and `leading` is `false`, `func` invocation is deferred
+	 * until to the next tick, similar to `setTimeout` with a timeout of `0`.
+	 *
+	 * See [David Corbacho's article](https://css-tricks.com/debouncing-throttling-explained-examples/)
+	 * for details over the differences between `_.debounce` and `_.throttle`.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 0.1.0
+	 * @category Function
+	 * @param {Function} func The function to debounce.
+	 * @param {number} [wait=0] The number of milliseconds to delay.
+	 * @param {Object} [options={}] The options object.
+	 * @param {boolean} [options.leading=false]
+	 *  Specify invoking on the leading edge of the timeout.
+	 * @param {number} [options.maxWait]
+	 *  The maximum time `func` is allowed to be delayed before it's invoked.
+	 * @param {boolean} [options.trailing=true]
+	 *  Specify invoking on the trailing edge of the timeout.
+	 * @returns {Function} Returns the new debounced function.
+	 * @example
+	 *
+	 * // Avoid costly calculations while the window size is in flux.
+	 * jQuery(window).on('resize', _.debounce(calculateLayout, 150));
+	 *
+	 * // Invoke `sendMail` when clicked, debouncing subsequent calls.
+	 * jQuery(element).on('click', _.debounce(sendMail, 300, {
+	 *   'leading': true,
+	 *   'trailing': false
+	 * }));
+	 *
+	 * // Ensure `batchLog` is invoked once after 1 second of debounced calls.
+	 * var debounced = _.debounce(batchLog, 250, { 'maxWait': 1000 });
+	 * var source = new EventSource('/stream');
+	 * jQuery(source).on('message', debounced);
+	 *
+	 * // Cancel the trailing debounced invocation.
+	 * jQuery(window).on('popstate', debounced.cancel);
+	 */
+	function debounce(func, wait, options) {
+	  var lastArgs,
+	      lastThis,
+	      maxWait,
+	      result,
+	      timerId,
+	      lastCallTime,
+	      lastInvokeTime = 0,
+	      leading = false,
+	      maxing = false,
+	      trailing = true;
+
+	  if (typeof func != 'function') {
+	    throw new TypeError(FUNC_ERROR_TEXT);
+	  }
+	  wait = toNumber(wait) || 0;
+	  if (isObject(options)) {
+	    leading = !!options.leading;
+	    maxing = 'maxWait' in options;
+	    maxWait = maxing ? nativeMax(toNumber(options.maxWait) || 0, wait) : maxWait;
+	    trailing = 'trailing' in options ? !!options.trailing : trailing;
+	  }
+
+	  function invokeFunc(time) {
+	    var args = lastArgs,
+	        thisArg = lastThis;
+
+	    lastArgs = lastThis = undefined;
+	    lastInvokeTime = time;
+	    result = func.apply(thisArg, args);
+	    return result;
+	  }
+
+	  function leadingEdge(time) {
+	    // Reset any `maxWait` timer.
+	    lastInvokeTime = time;
+	    // Start the timer for the trailing edge.
+	    timerId = setTimeout(timerExpired, wait);
+	    // Invoke the leading edge.
+	    return leading ? invokeFunc(time) : result;
+	  }
+
+	  function remainingWait(time) {
+	    var timeSinceLastCall = time - lastCallTime,
+	        timeSinceLastInvoke = time - lastInvokeTime,
+	        result = wait - timeSinceLastCall;
+
+	    return maxing ? nativeMin(result, maxWait - timeSinceLastInvoke) : result;
+	  }
+
+	  function shouldInvoke(time) {
+	    var timeSinceLastCall = time - lastCallTime,
+	        timeSinceLastInvoke = time - lastInvokeTime;
+
+	    // Either this is the first call, activity has stopped and we're at the
+	    // trailing edge, the system time has gone backwards and we're treating
+	    // it as the trailing edge, or we've hit the `maxWait` limit.
+	    return (lastCallTime === undefined || (timeSinceLastCall >= wait) ||
+	      (timeSinceLastCall < 0) || (maxing && timeSinceLastInvoke >= maxWait));
+	  }
+
+	  function timerExpired() {
+	    var time = now();
+	    if (shouldInvoke(time)) {
+	      return trailingEdge(time);
+	    }
+	    // Restart the timer.
+	    timerId = setTimeout(timerExpired, remainingWait(time));
+	  }
+
+	  function trailingEdge(time) {
+	    timerId = undefined;
+
+	    // Only invoke if we have `lastArgs` which means `func` has been
+	    // debounced at least once.
+	    if (trailing && lastArgs) {
+	      return invokeFunc(time);
+	    }
+	    lastArgs = lastThis = undefined;
+	    return result;
+	  }
+
+	  function cancel() {
+	    if (timerId !== undefined) {
+	      clearTimeout(timerId);
+	    }
+	    lastInvokeTime = 0;
+	    lastArgs = lastCallTime = lastThis = timerId = undefined;
+	  }
+
+	  function flush() {
+	    return timerId === undefined ? result : trailingEdge(now());
+	  }
+
+	  function debounced() {
+	    var time = now(),
+	        isInvoking = shouldInvoke(time);
+
+	    lastArgs = arguments;
+	    lastThis = this;
+	    lastCallTime = time;
+
+	    if (isInvoking) {
+	      if (timerId === undefined) {
+	        return leadingEdge(lastCallTime);
+	      }
+	      if (maxing) {
+	        // Handle invocations in a tight loop.
+	        timerId = setTimeout(timerExpired, wait);
+	        return invokeFunc(lastCallTime);
+	      }
+	    }
+	    if (timerId === undefined) {
+	      timerId = setTimeout(timerExpired, wait);
+	    }
+	    return result;
+	  }
+	  debounced.cancel = cancel;
+	  debounced.flush = flush;
+	  return debounced;
+	}
+
+	module.exports = debounce;
+
+
+/***/ },
+/* 21 */
+/***/ function(module, exports) {
+
+	/**
+	 * Checks if `value` is the
+	 * [language type](http://www.ecma-international.org/ecma-262/7.0/#sec-ecmascript-language-types)
+	 * of `Object`. (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 0.1.0
+	 * @category Lang
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is an object, else `false`.
+	 * @example
+	 *
+	 * _.isObject({});
+	 * // => true
+	 *
+	 * _.isObject([1, 2, 3]);
+	 * // => true
+	 *
+	 * _.isObject(_.noop);
+	 * // => true
+	 *
+	 * _.isObject(null);
+	 * // => false
+	 */
+	function isObject(value) {
+	  var type = typeof value;
+	  return value != null && (type == 'object' || type == 'function');
+	}
+
+	module.exports = isObject;
+
+
+/***/ },
+/* 22 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var root = __webpack_require__(7);
+
+	/**
+	 * Gets the timestamp of the number of milliseconds that have elapsed since
+	 * the Unix epoch (1 January 1970 00:00:00 UTC).
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 2.4.0
+	 * @category Date
+	 * @returns {number} Returns the timestamp.
+	 * @example
+	 *
+	 * _.defer(function(stamp) {
+	 *   console.log(_.now() - stamp);
+	 * }, _.now());
+	 * // => Logs the number of milliseconds it took for the deferred invocation.
+	 */
+	var now = function() {
+	  return root.Date.now();
+	};
+
+	module.exports = now;
+
+
+/***/ },
+/* 23 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var isObject = __webpack_require__(21),
+	    isSymbol = __webpack_require__(4);
+
+	/** Used as references for various `Number` constants. */
+	var NAN = 0 / 0;
+
+	/** Used to match leading and trailing whitespace. */
+	var reTrim = /^\s+|\s+$/g;
+
+	/** Used to detect bad signed hexadecimal string values. */
+	var reIsBadHex = /^[-+]0x[0-9a-f]+$/i;
+
+	/** Used to detect binary string values. */
+	var reIsBinary = /^0b[01]+$/i;
+
+	/** Used to detect octal string values. */
+	var reIsOctal = /^0o[0-7]+$/i;
+
+	/** Built-in method references without a dependency on `root`. */
+	var freeParseInt = parseInt;
+
+	/**
+	 * Converts `value` to a number.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 4.0.0
+	 * @category Lang
+	 * @param {*} value The value to process.
+	 * @returns {number} Returns the number.
+	 * @example
+	 *
+	 * _.toNumber(3.2);
+	 * // => 3.2
+	 *
+	 * _.toNumber(Number.MIN_VALUE);
+	 * // => 5e-324
+	 *
+	 * _.toNumber(Infinity);
+	 * // => Infinity
+	 *
+	 * _.toNumber('3.2');
+	 * // => 3.2
+	 */
+	function toNumber(value) {
+	  if (typeof value == 'number') {
+	    return value;
+	  }
+	  if (isSymbol(value)) {
+	    return NAN;
+	  }
+	  if (isObject(value)) {
+	    var other = typeof value.valueOf == 'function' ? value.valueOf() : value;
+	    value = isObject(other) ? (other + '') : other;
+	  }
+	  if (typeof value != 'string') {
+	    return value === 0 ? value : +value;
+	  }
+	  value = value.replace(reTrim, '');
+	  var isBinary = reIsBinary.test(value);
+	  return (isBinary || reIsOctal.test(value))
+	    ? freeParseInt(value.slice(2), isBinary ? 2 : 8)
+	    : (reIsBadHex.test(value) ? NAN : +value);
+	}
+
+	module.exports = toNumber;
+
 
 /***/ }
 /******/ ])

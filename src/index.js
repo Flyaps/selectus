@@ -1,5 +1,6 @@
 require('./main.styl');
 
+import {debounce} from 'lodash';
 import $ from 'jquery';
 
 const selectedItemClass = 'selectus__selected-item';
@@ -7,6 +8,7 @@ const dropdownOpenClass = 'selectus_dropdown-open';
 const tabSelectedClass = 'selectus__tab_selected';
 const listSelectedClass = 'selectus__list_selected';
 const itemSelectedClass = 'selectus__item_selected';
+const manySelectedItemsExpandClass = 'selectus_many-selected-items_expand';
 
 class Selectus {
 
@@ -48,6 +50,8 @@ class Selectus {
          $selectedItems: $element.find('.selectus__selected-items'),
          $dropdown: $element.find('.selectus__dropdown'),
          $title: $element.find('.selectus__title'),
+         $numWrap: $element.find('.selectus__num-wrap'),
+         $num: $element.find('.selectus__num'),
          $currentType: $element.find('.selectus__current-type'),
          $tabs: $element.find('.selectus__tabs'),
          $lists: $element.find('.selectus__lists'),
@@ -56,8 +60,9 @@ class Selectus {
 
       const {
               elements: {
+                $window,
                 $dropdown,
-                $window
+                $currentType
               }
             } = self;
 
@@ -99,15 +104,17 @@ class Selectus {
 
          const index = $self.index();
 
-         const $currentList = $element.find('.selectus__list').eq(index);
+         $currentType.html($self.html());
 
-         $currentList.siblings().removeClass(listSelectedClass);
+         const $list = $element.find('.selectus__list').eq(index);
 
-         $currentList.show();
+         $list.siblings().removeClass(listSelectedClass);
 
-         $currentList.height();
+         $list.show();
 
-         $currentList.addClass(listSelectedClass);
+         $list.height();
+
+         $list.addClass(listSelectedClass);
 
          self.setSelectedItemsOfCurrentTab();
 
@@ -125,6 +132,8 @@ class Selectus {
             self.removeSelectedItem($self.data('id'));
          }
 
+         self.setNumSelectedItems();
+
       });
 
       $element.on('click', '.selectus__selected-item-remove', e => {
@@ -133,7 +142,25 @@ class Selectus {
             const $item = $(e.currentTarget).parent();
 
             self.removeSelectedItem($item.data('id'));
+
+            self.setNumSelectedItems();
          });
+
+      });
+
+      $element.on('click', '.selectus__expand', e => {
+
+         e.preventDefault();
+
+         $element.addClass(manySelectedItemsExpandClass);
+
+      });
+
+      $element.on('click', '.selectus__collapse', e => {
+
+         e.preventDefault();
+
+         $element.removeClass(manySelectedItemsExpandClass);
 
       });
 
@@ -162,12 +189,14 @@ class Selectus {
       $window.on('click', e => {
 
          if (!$(e.target).closest($element).length) {
-            console.log('hideDropdown');
 
             self.hideDropdown();
+
          }
 
       });
+
+      $window.on('resize', debounce(self.updateSelectedItemsWidth.bind(self), 150));
    }
 
    setValuesToInput() {
@@ -237,6 +266,34 @@ class Selectus {
 
    }
 
+   setNumSelectedItems() {
+
+      const {
+              elements: {
+                $numWrap,
+                $num,
+                $lists
+              }
+            } = this;
+
+      let num = $lists.find(`.${listSelectedClass} .${itemSelectedClass}`).length;
+
+      if (num) {
+
+         $num.html(`${num}`);
+
+         $numWrap.show();
+
+      } else {
+
+         $num.html(``);
+
+         $numWrap.hide();
+
+      }
+
+   }
+
    setSelectedItemsOfCurrentTab() {
 
       const self = this;
@@ -261,6 +318,35 @@ class Selectus {
         });
 
       this.setValuesToInput();
+
+      this.setNumSelectedItems();
+
+   }
+
+   updateSelectedItemsWidth() {
+
+      const {
+              elements: {
+                $element,
+                $selectedItems
+              }
+            } = this;
+
+      const rightВorderSelectusPosition = $element.offset().left + $element.innerWidth();
+
+      const $item = $selectedItems.find('.selectus__selected-item:last-child');
+
+      const rightВorderSelectedLastItemPosition = $item.offset().left + $item.innerWidth() + 1;
+
+      if (rightВorderSelectedLastItemPosition > rightВorderSelectusPosition) {
+
+         $element.addClass('selectus_many-selected-items');
+
+      } else {
+
+         $element.removeClass('selectus_many-selected-items');
+
+      }
 
    }
 
@@ -304,7 +390,6 @@ class Selectus {
       const {
               options,
               elements: {
-                $element,
                 $title,
                 $currentType,
                 $tabs,
@@ -345,11 +430,19 @@ class Selectus {
 
          o.items.forEach(item => {
 
-            $items.append(`<p class="selectus__item" data-id="${item.id}">${item.name}</p>`);
+            let additionalClass = '';
+
+            if (item.selected) {
+               additionalClass = ` ${itemSelectedClass}`;
+            }
+
+            $items.append(`<p class="selectus__item${additionalClass}" data-id="${item.id}">${item.name}</p>`);
 
          });
 
       });
+
+      this.setSelectedItemsOfCurrentTab();
 
    }
 
@@ -373,10 +466,10 @@ Selectus.defaults = {
    mainHTML: '<div class="selectus__brief">\
                  <p class="selectus__current">\
                     <a href class="selectus__current-type"></a>\
-                    <span class="selectus__num-wrap">(<span class="selectus__num"></span>):</span>\
+                    <span class="selectus__num-wrap" style="display: none;">(<span class="selectus__num"></span>):</span>\
                  </p>\
                  <div class="selectus__selected-items"></div>\
-                 <a class="selectus__more" href></a>\
+                 <a class="selectus__expand" href>expand</a>\
                  <a class="selectus__collapse" href>collapse</a>\
               </div>\
               <div class="selectus__dropdown">\

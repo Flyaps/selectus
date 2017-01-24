@@ -12,6 +12,38 @@
             &current-type
                &:before
                   transform: rotate(180deg)
+   &_many-selected-items
+      .selectus
+         &__
+            &selected-items
+               height: 30px;
+               position: relative
+               overflow: hidden;
+               margin-right: 10px;
+               &:after
+                  width: 20px
+                  position: absolute
+                  top: 0
+                  right: 0
+                  bottom: 0
+                  background-image: linear-gradient(to right, transparent, #fff);
+                  content: ''
+            &expand
+               display inline-block
+            &collapse
+               display none
+      &_expand
+         .selectus
+            &__
+               &selected-items
+                  height: auto
+                  flex-wrap: wrap
+                  &:after
+                     content none
+               &expand
+                  display none
+               &collapse
+                  display inline-block
    &__
       &brief
          min-height: 30px;
@@ -40,8 +72,6 @@
       &selected
          &-items
             display: flex
-            flex-wrap: wrap;
-            align-items: center;
             padding-left: 5px;
          &-item
             position: relative
@@ -62,7 +92,7 @@
                text-align: center
                color: #cacdd0
                cursor: pointer
-      &more, &collapse
+      &expand, &collapse
          display: none
          border-bottom: 1px dotted #383c40
          text-decoration: none
