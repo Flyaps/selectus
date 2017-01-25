@@ -60,6 +60,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	   value: true
 	});
 
+	var _throttle2 = __webpack_require__(18);
+
+	var _throttle3 = _interopRequireDefault(_throttle2);
+
 	var _debounce2 = __webpack_require__(1);
 
 	var _debounce3 = _interopRequireDefault(_debounce2);
@@ -460,7 +464,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (o.ajax) {
 	               (function () {
 
-	                  var $search = (0, _jquery2.default)('<div class="selectus__search">                                 <input class="selectus__search-input" placeholder="Start to type" data-url="' + o.ajax.url + '">                               </div>');
+	                  var $search = (0, _jquery2.default)('<div class="selectus__search">                                 <input class="selectus__search-input" placeholder="Start to type">                               </div>');
 
 	                  $list.prepend($search);
 
@@ -472,9 +476,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	                     delay = parseFloat(o.delay, 10);
 	                  }
 
+	                  var options = {
+	                     url: o.ajax.url,
+	                     page: 1
+	                  };
+
+	                  $list.data('options', options);
+
 	                  var $items = $list.find('.selectus__items');
 
-	                  var keyup = (0, _debounce3.default)(function (e) {
+	                  $searchInput.on('keyup', (0, _debounce3.default)(function (e) {
 
 	                     var isLetter = e.which >= 48 && e.which <= 90 || e.which === 8;
 
@@ -482,22 +493,104 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        return;
 	                     }
 
-	                     var val = $searchInput.val();
+	                     var val = _jquery2.default.trim($searchInput.val());
+
+	                     var options = $list.data('options');
+
+	                     _jquery2.default.extend(options, {
+	                        term: val,
+	                        page: 1
+	                     });
 
 	                     var data = {
-	                        q: val
+	                        q: val,
+	                        p: options.page
 	                     };
 
 	                     if (o.ajax.data) {
 	                        data = o.ajax.data({
-	                           term: _jquery2.default.trim($searchInput.val())
+	                           term: val,
+	                           page: options.page
 	                        });
 	                     }
 
-	                     _jquery2.default.ajax({
-	                        url: $searchInput.data('url'),
+	                     if (options.ajax && options.ajax.abort) {
+	                        options.ajax.abort();
+	                     }
+
+	                     options.ajax = _jquery2.default.ajax({
+	                        url: options.url,
 	                        data: data
-	                     }).then(function (data) {
+	                     });
+
+	                     options.ajax.then(function (data) {
+
+	                        data = {
+	                           items: [{
+	                              id: 10,
+	                              name: '12345677645345345',
+	                              selected: true
+	                           }, {
+	                              id: 11,
+	                              name: '12345'
+	                           }, {
+	                              id: 12,
+	                              name: '12345'
+	                           }]
+	                        };
+
+	                        if (o.ajax.processResults) {
+	                           data = o.ajax.processResults(data);
+	                        }
+
+	                        self.addItemsToList(data, $items);
+	                     });
+
+	                     $list.data('options', options);
+	                  }, delay));
+
+	                  var pointDistanceToBottom = 50;
+
+	                  $items.on('scroll', (0, _throttle3.default)(function () {
+
+	                     var correntDistanceToBottom = $items.get(0).scrollHeight - ($items.scrollTop() + $items.innerHeight());
+
+	                     if (correntDistanceToBottom > pointDistanceToBottom) {
+	                        return;
+	                     }
+
+	                     var options = $list.data('options');
+
+	                     if (options.ajax && options.ajax.readyState !== 4) {
+	                        return;
+	                     }
+
+	                     _jquery2.default.extend(options, {
+	                        page: options.page + 1
+	                     });
+
+	                     var data = {
+	                        q: options.term,
+	                        p: options.page
+	                     };
+
+	                     if (o.ajax.data) {
+	                        data = o.ajax.data({
+	                           term: options.term,
+	                           page: options.page
+	                        });
+	                     }
+
+	                     var $loader = (0, _jquery2.default)('<div class="selectus__loader-wrap"><span class="selectus__loader"></span></div>');
+
+	                     $items.$loader($loader);
+
+	                     options.ajax = _jquery2.default.ajax({
+	                        url: options.url,
+	                        data: data
+	                     });
+
+	                     options.ajax.then(function (data) {
 
 	                        data = {
 	                           items: [{
@@ -519,11 +612,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	                        self.addItemsToList(data, $items);
 
-	                        // console.log('data', data);
+	                        $loader.remove();
 	                     });
-	                  }, delay);
 
-	                  $searchInput.on('keyup', keyup);
+	                     $list.data('options', options);
+	                  }, 100));
 	               })();
 	            } else {
 
@@ -533,6 +626,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	         self.setSelectedItemsOfCurrentTab();
 	      }
+	   }, {
+	      key: 'getMoreInfo',
+	      value: function getMoreInfo($items) {}
 	   }, {
 	      key: 'val',
 	      value: function val() {
@@ -1161,6 +1257,84 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports) {
 
 	// removed by extract-text-webpack-plugin
+
+/***/ },
+/* 15 */,
+/* 16 */,
+/* 17 */,
+/* 18 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var debounce = __webpack_require__(1),
+	    isObject = __webpack_require__(2);
+
+	/** Error message constants. */
+	var FUNC_ERROR_TEXT = 'Expected a function';
+
+	/**
+	 * Creates a throttled function that only invokes `func` at most once per
+	 * every `wait` milliseconds. The throttled function comes with a `cancel`
+	 * method to cancel delayed `func` invocations and a `flush` method to
+	 * immediately invoke them. Provide `options` to indicate whether `func`
+	 * should be invoked on the leading and/or trailing edge of the `wait`
+	 * timeout. The `func` is invoked with the last arguments provided to the
+	 * throttled function. Subsequent calls to the throttled function return the
+	 * result of the last `func` invocation.
+	 *
+	 * **Note:** If `leading` and `trailing` options are `true`, `func` is
+	 * invoked on the trailing edge of the timeout only if the throttled function
+	 * is invoked more than once during the `wait` timeout.
+	 *
+	 * If `wait` is `0` and `leading` is `false`, `func` invocation is deferred
+	 * until to the next tick, similar to `setTimeout` with a timeout of `0`.
+	 *
+	 * See [David Corbacho's article](https://css-tricks.com/debouncing-throttling-explained-examples/)
+	 * for details over the differences between `_.throttle` and `_.debounce`.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 0.1.0
+	 * @category Function
+	 * @param {Function} func The function to throttle.
+	 * @param {number} [wait=0] The number of milliseconds to throttle invocations to.
+	 * @param {Object} [options={}] The options object.
+	 * @param {boolean} [options.leading=true]
+	 *  Specify invoking on the leading edge of the timeout.
+	 * @param {boolean} [options.trailing=true]
+	 *  Specify invoking on the trailing edge of the timeout.
+	 * @returns {Function} Returns the new throttled function.
+	 * @example
+	 *
+	 * // Avoid excessively updating the position while scrolling.
+	 * jQuery(window).on('scroll', _.throttle(updatePosition, 100));
+	 *
+	 * // Invoke `renewToken` when the click event is fired, but not more than once every 5 minutes.
+	 * var throttled = _.throttle(renewToken, 300000, { 'trailing': false });
+	 * jQuery(element).on('click', throttled);
+	 *
+	 * // Cancel the trailing throttled invocation.
+	 * jQuery(window).on('popstate', throttled.cancel);
+	 */
+	function throttle(func, wait, options) {
+	  var leading = true,
+	      trailing = true;
+
+	  if (typeof func != 'function') {
+	    throw new TypeError(FUNC_ERROR_TEXT);
+	  }
+	  if (isObject(options)) {
+	    leading = 'leading' in options ? !!options.leading : leading;
+	    trailing = 'trailing' in options ? !!options.trailing : trailing;
+	  }
+	  return debounce(func, wait, {
+	    'leading': leading,
+	    'maxWait': wait,
+	    'trailing': trailing
+	  });
+	}
+
+	module.exports = throttle;
+
 
 /***/ }
 /******/ ])

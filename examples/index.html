@@ -85,11 +85,13 @@
                   data: function (params) {
                      return {
                         q: params.term,
+                        p: params.page
                      };
                   },
                   processResults: function (data) {
                      return data.items
-                  }
+                  },
+                  lazyLoading: true
                }
             }
          ]

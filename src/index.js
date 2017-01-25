@@ -1,6 +1,6 @@
 require('./main.styl');
 
-import {debounce} from 'lodash';
+import {debounce, throttle} from 'lodash';
 import $ from 'jquery';
 
 const selectedItemClass = 'selectus__selected-item';
@@ -447,7 +447,7 @@ class Selectus {
          if (o.ajax) {
 
             const $search = $(`<div class="selectus__search">\
-                                 <input class="selectus__search-input" placeholder="Start to type" data-url="${o.ajax.url}">\
+                                 <input class="selectus__search-input" placeholder="Start to type">\
                                </div>`);
 
             $list.prepend($search);
@@ -460,9 +460,16 @@ class Selectus {
                delay = parseFloat(o.delay, 10);
             }
 
-           const $items = $list.find('.selectus__items');
-            
-            const keyup = debounce(e => {
+            let options = {
+               url: o.ajax.url,
+               page: 1
+            }
+
+            $list.data('options', options);
+
+            const $items = $list.find('.selectus__items');
+
+            $searchInput.on('keyup', debounce(e => {
 
                const isLetter = (e.which >= 48 && e.which <= 90) || e.which === 8;
 
@@ -470,22 +477,37 @@ class Selectus {
                   return;
                }
 
-               const val = $searchInput.val();
+               const val = $.trim($searchInput.val());
+
+               let options = $list.data('options');
+
+               $.extend(options, {
+                  term: val,
+                  page: 1
+               });
 
                let data = {
-                  q: val
+                  q: val,
+                  p: options.page
                };
 
                if (o.ajax.data) {
                   data = o.ajax.data({
-                     term: $.trim($searchInput.val())
+                     term: val,
+                     page: options.page
                   });
                }
 
-               $.ajax({
-                  url: $searchInput.data('url'),
+               if (options.ajax && options.ajax.abort) {
+                  options.ajax.abort();
+               }
+
+               options.ajax = $.ajax({
+                  url: options.url,
                   data
-               }).then(data => {
+               });
+
+               options.ajax.then(data => {
 
                   data = {
                      items: [
@@ -510,14 +532,87 @@ class Selectus {
                   }
 
                   self.addItemsToList(data, $items);
-                  
-                  // console.log('data', data);
 
                });
 
-            }, delay);
+               $list.data('options', options);
 
-            $searchInput.on('keyup', keyup);
+            }, delay));
+
+            const pointDistanceToBottom = 50;
+
+            $items.on('scroll', throttle(() => {
+
+               const correntDistanceToBottom = $items.get(0).scrollHeight - ($items.scrollTop() + $items.innerHeight());
+
+               if (correntDistanceToBottom > pointDistanceToBottom) {
+                  return;
+               }
+
+               let options = $list.data('options');
+
+               if (options.ajax && options.ajax.readyState !== 4) {
+                 return;
+               }
+
+               $.extend(options, {
+                  page: options.page + 1
+               });
+
+               let data = {
+                  q: options.term,
+                  p: options.page
+               };
+
+               if (o.ajax.data) {
+                  data = o.ajax.data({
+                     term: options.term,
+                     page: options.page
+                  });
+               }
+
+               const $loader = $('<div class="selectus__loader-wrap"><span class="selectus__loader"></span></div>');
+
+               $items.$loader($loader)
+
+               options.ajax = $.ajax({
+                  url: options.url,
+                  data
+               });
+
+               options.ajax.then(data => {
+
+                  data = {
+                     items: [
+                        {
+                           id: 10,
+                           name: '12345677645345345',
+                           selected: true
+                        },
+                        {
+                           id: 11,
+                           name: '12345'
+                        },
+                        {
+                           id: 12,
+                           name: '12345'
+                        }
+                     ]
+                  }
+
+                  if (o.ajax.processResults) {
+                     data = o.ajax.processResults(data)
+                  }
+
+                  self.addItemsToList(data, $items);
+
+                  $loader.remove();
+
+               });
+
+               $list.data('options', options);
+
+            }, 100));
 
          } else {
 
@@ -528,6 +623,11 @@ class Selectus {
       });
 
       self.setSelectedItemsOfCurrentTab();
+
+   }
+
+   getMoreInfo($items) {
+
 
    }
 

@@ -195,6 +195,10 @@
   border: 1px solid #dbdddf;
   border-radius: 2px;
 }
+.selectus__search + .selectus__items {
+  margin-top: 10px;
+  padding-top: 0;
+}
 .selectus__lists {
   position: relative;
 }
@@ -249,4 +253,12 @@
 }
 .selectus__item_selected:before {
   content: '\F00C';
+}
+.selectus__loader {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+}
+.selectus__loader-wrap {
+  position: relative;
 }
