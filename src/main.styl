@@ -74,13 +74,17 @@
             display: flex
             padding-left: 5px;
          &-item
+            max-width: 200px;
             position: relative
+            overflow: hidden;
             margin: 2px 4px;
             padding: 0 22px 0 10px;
             border: 1px solid #cacdd0
             background-color: #f8f8f8
             border-radius: 2px;
             line-height: 24px
+            white-space: nowrap;
+            text-overflow: ellipsis;
             &-remove
                width: 14px
                height: @width
@@ -138,7 +142,7 @@
             border-bottom-color #53a87d
       &search
          position: relative
-         margin-bottom: 6px;
+         margin-top: 8px;
          &:before
             width: 16px
             height: @width
@@ -166,7 +170,7 @@
          position: absolute
          top: 0
          left: 0
-         padding: 8px 16px 0
+         padding: 0 16px
          opacity: 0
          transition: opacity .15s ease-out;
          &_selected
@@ -179,8 +183,7 @@
          flex-direction column
          align-items: flex-start
          margin-right: -16px;
-         padding-right: 16px;
-         padding-bottom: 16px
+         padding: 10px 16px 10px 0
       &item
          position: relative
          margin: 6px 0

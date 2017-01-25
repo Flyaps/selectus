@@ -7,7 +7,7 @@
 		exports["selectus"] = factory(require("jquery"));
 	else
 		root["selectus"] = factory(root["jQuery"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_15__) {
+})(this, function(__WEBPACK_EXTERNAL_MODULE_13__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -60,7 +60,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   value: true
 	});
 
-	var _debounce2 = __webpack_require__(20);
+	var _debounce2 = __webpack_require__(1);
 
 	var _debounce3 = _interopRequireDefault(_debounce2);
 
@@ -68,7 +68,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _jquery = __webpack_require__(15);
+	var _jquery = __webpack_require__(13);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
@@ -76,7 +76,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	__webpack_require__(16);
+	__webpack_require__(14);
 
 	var selectedItemClass = 'selectus__selected-item';
 	var dropdownOpenClass = 'selectus_dropdown-open';
@@ -363,7 +363,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	         var $item = $selectedItems.find('.selectus__selected-item:last-child');
 
-	         var rightВorderSelectedLastItemPosition = $item.offset().left + $item.innerWidth() + 1;
+	         var rightВorderSelectedLastItemPosition = $item.offset().left + $item.innerWidth() + 3;
 
 	         if (rightВorderSelectedLastItemPosition > rightВorderSelectusPosition) {
 
@@ -402,14 +402,36 @@ return /******/ (function(modules) { // webpackBootstrap
 	         $element.removeClass(dropdownOpenClass);
 	      }
 	   }, {
+	      key: 'addItemsToList',
+	      value: function addItemsToList(items, $items) {
+
+	         if (!items.length) {
+	            return;
+	         }
+
+	         items.forEach(function (item) {
+
+	            var additionalClass = '';
+
+	            if (item.selected) {
+	               additionalClass = ' ' + itemSelectedClass;
+	            }
+
+	            $items.append('<p class="selectus__item' + additionalClass + '" data-id="' + item.id + '">' + item.name + '</p>');
+	         });
+	      }
+	   }, {
 	      key: 'updateHTMLData',
 	      value: function updateHTMLData() {
-	         var options = this.options,
-	             _elements7 = this.elements,
-	             $title = _elements7.$title,
-	             $currentType = _elements7.$currentType,
-	             $tabs = _elements7.$tabs,
-	             $lists = _elements7.$lists;
+
+	         var self = this;
+
+	         var options = self.options,
+	             _self$elements2 = self.elements,
+	             $title = _self$elements2.$title,
+	             $currentType = _self$elements2.$currentType,
+	             $tabs = _self$elements2.$tabs,
+	             $lists = _self$elements2.$lists;
 
 
 	         $title.html(options.typesName);
@@ -421,9 +443,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var $tab = (0, _jquery2.default)('<a class="selectus__tab" href>' + o.name + '</a>');
 
 	            var $list = (0, _jquery2.default)('<div class="selectus__list" style="display: none;">\
-	                             <div class="selectus__search">\
-	                                <input class="selectus__search-input">\
-	                             </div>\
 	                             <div class="selectus__items"></div>\
 	                          </div>');
 
@@ -438,21 +457,81 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            $lists.append($list);
 
-	            var $items = $list.find('.selectus__items');
+	            if (o.ajax) {
+	               (function () {
 
-	            o.items.forEach(function (item) {
+	                  var $search = (0, _jquery2.default)('<div class="selectus__search">                                 <input class="selectus__search-input" placeholder="Start to type" data-url="' + o.ajax.url + '">                               </div>');
 
-	               var additionalClass = '';
+	                  $list.prepend($search);
 
-	               if (item.selected) {
-	                  additionalClass = ' ' + itemSelectedClass;
-	               }
+	                  var $searchInput = $search.find('.selectus__search-input');
 
-	               $items.append('<p class="selectus__item' + additionalClass + '" data-id="' + item.id + '">' + item.name + '</p>');
-	            });
+	                  var delay = 250;
+
+	                  if (o.ajax.delay) {
+	                     delay = parseFloat(o.delay, 10);
+	                  }
+
+	                  var $items = $list.find('.selectus__items');
+
+	                  var keyup = (0, _debounce3.default)(function (e) {
+
+	                     var isLetter = e.which >= 48 && e.which <= 90 || e.which === 8;
+
+	                     if (!isLetter) {
+	                        return;
+	                     }
+
+	                     var val = $searchInput.val();
+
+	                     var data = {
+	                        q: val
+	                     };
+
+	                     if (o.ajax.data) {
+	                        data = o.ajax.data({
+	                           term: _jquery2.default.trim($searchInput.val())
+	                        });
+	                     }
+
+	                     _jquery2.default.ajax({
+	                        url: $searchInput.data('url'),
+	                        data: data
+	                     }).then(function (data) {
+
+	                        data = {
+	                           items: [{
+	                              id: 10,
+	                              name: '12345677645345345',
+	                              selected: true
+	                           }, {
+	                              id: 11,
+	                              name: '12345'
+	                           }, {
+	                              id: 12,
+	                              name: '12345'
+	                           }]
+	                        };
+
+	                        if (o.ajax.processResults) {
+	                           data = o.ajax.processResults(data);
+	                        }
+
+	                        self.addItemsToList(data, $items);
+
+	                        // console.log('data', data);
+	                     });
+	                  }, delay);
+
+	                  $searchInput.on('keyup', keyup);
+	               })();
+	            } else {
+
+	               self.addItemsToList(o.items, $list.find('.selectus__items'));
+	            }
 	         });
 
-	         this.setSelectedItemsOfCurrentTab();
+	         self.setSelectedItemsOfCurrentTab();
 	      }
 	   }, {
 	      key: 'val',
@@ -493,8 +572,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	_jquery2.default.fn[pluginName] = function (option) {
 	   return this.each(function (i, el) {
 
-	      console.log(typeof option === 'undefined' ? 'undefined' : _typeof(option));
-
 	      var $this = (0, _jquery2.default)(el);
 	      var data = $this.data('__' + pluginName);
 
@@ -520,255 +597,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Selectus;
 
 /***/ },
-/* 1 */,
-/* 2 */,
-/* 3 */,
-/* 4 */
+/* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var baseGetTag = __webpack_require__(5),
-	    isObjectLike = __webpack_require__(11);
-
-	/** `Object#toString` result references. */
-	var symbolTag = '[object Symbol]';
-
-	/**
-	 * Checks if `value` is classified as a `Symbol` primitive or object.
-	 *
-	 * @static
-	 * @memberOf _
-	 * @since 4.0.0
-	 * @category Lang
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is a symbol, else `false`.
-	 * @example
-	 *
-	 * _.isSymbol(Symbol.iterator);
-	 * // => true
-	 *
-	 * _.isSymbol('abc');
-	 * // => false
-	 */
-	function isSymbol(value) {
-	  return typeof value == 'symbol' ||
-	    (isObjectLike(value) && baseGetTag(value) == symbolTag);
-	}
-
-	module.exports = isSymbol;
-
-
-/***/ },
-/* 5 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var Symbol = __webpack_require__(6),
-	    getRawTag = __webpack_require__(9),
-	    objectToString = __webpack_require__(10);
-
-	/** `Object#toString` result references. */
-	var nullTag = '[object Null]',
-	    undefinedTag = '[object Undefined]';
-
-	/** Built-in value references. */
-	var symToStringTag = Symbol ? Symbol.toStringTag : undefined;
-
-	/**
-	 * The base implementation of `getTag` without fallbacks for buggy environments.
-	 *
-	 * @private
-	 * @param {*} value The value to query.
-	 * @returns {string} Returns the `toStringTag`.
-	 */
-	function baseGetTag(value) {
-	  if (value == null) {
-	    return value === undefined ? undefinedTag : nullTag;
-	  }
-	  return (symToStringTag && symToStringTag in Object(value))
-	    ? getRawTag(value)
-	    : objectToString(value);
-	}
-
-	module.exports = baseGetTag;
-
-
-/***/ },
-/* 6 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var root = __webpack_require__(7);
-
-	/** Built-in value references. */
-	var Symbol = root.Symbol;
-
-	module.exports = Symbol;
-
-
-/***/ },
-/* 7 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var freeGlobal = __webpack_require__(8);
-
-	/** Detect free variable `self`. */
-	var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
-
-	/** Used as a reference to the global object. */
-	var root = freeGlobal || freeSelf || Function('return this')();
-
-	module.exports = root;
-
-
-/***/ },
-/* 8 */
-/***/ function(module, exports) {
-
-	/* WEBPACK VAR INJECTION */(function(global) {/** Detect free variable `global` from Node.js. */
-	var freeGlobal = typeof global == 'object' && global && global.Object === Object && global;
-
-	module.exports = freeGlobal;
-
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
-
-/***/ },
-/* 9 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var Symbol = __webpack_require__(6);
-
-	/** Used for built-in method references. */
-	var objectProto = Object.prototype;
-
-	/** Used to check objects for own properties. */
-	var hasOwnProperty = objectProto.hasOwnProperty;
-
-	/**
-	 * Used to resolve the
-	 * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
-	 * of values.
-	 */
-	var nativeObjectToString = objectProto.toString;
-
-	/** Built-in value references. */
-	var symToStringTag = Symbol ? Symbol.toStringTag : undefined;
-
-	/**
-	 * A specialized version of `baseGetTag` which ignores `Symbol.toStringTag` values.
-	 *
-	 * @private
-	 * @param {*} value The value to query.
-	 * @returns {string} Returns the raw `toStringTag`.
-	 */
-	function getRawTag(value) {
-	  var isOwn = hasOwnProperty.call(value, symToStringTag),
-	      tag = value[symToStringTag];
-
-	  try {
-	    value[symToStringTag] = undefined;
-	    var unmasked = true;
-	  } catch (e) {}
-
-	  var result = nativeObjectToString.call(value);
-	  if (unmasked) {
-	    if (isOwn) {
-	      value[symToStringTag] = tag;
-	    } else {
-	      delete value[symToStringTag];
-	    }
-	  }
-	  return result;
-	}
-
-	module.exports = getRawTag;
-
-
-/***/ },
-/* 10 */
-/***/ function(module, exports) {
-
-	/** Used for built-in method references. */
-	var objectProto = Object.prototype;
-
-	/**
-	 * Used to resolve the
-	 * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
-	 * of values.
-	 */
-	var nativeObjectToString = objectProto.toString;
-
-	/**
-	 * Converts `value` to a string using `Object.prototype.toString`.
-	 *
-	 * @private
-	 * @param {*} value The value to convert.
-	 * @returns {string} Returns the converted string.
-	 */
-	function objectToString(value) {
-	  return nativeObjectToString.call(value);
-	}
-
-	module.exports = objectToString;
-
-
-/***/ },
-/* 11 */
-/***/ function(module, exports) {
-
-	/**
-	 * Checks if `value` is object-like. A value is object-like if it's not `null`
-	 * and has a `typeof` result of "object".
-	 *
-	 * @static
-	 * @memberOf _
-	 * @since 4.0.0
-	 * @category Lang
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
-	 * @example
-	 *
-	 * _.isObjectLike({});
-	 * // => true
-	 *
-	 * _.isObjectLike([1, 2, 3]);
-	 * // => true
-	 *
-	 * _.isObjectLike(_.noop);
-	 * // => false
-	 *
-	 * _.isObjectLike(null);
-	 * // => false
-	 */
-	function isObjectLike(value) {
-	  return value != null && typeof value == 'object';
-	}
-
-	module.exports = isObjectLike;
-
-
-/***/ },
-/* 12 */,
-/* 13 */,
-/* 14 */,
-/* 15 */
-/***/ function(module, exports) {
-
-	module.exports = __WEBPACK_EXTERNAL_MODULE_15__;
-
-/***/ },
-/* 16 */
-/***/ function(module, exports) {
-
-	// removed by extract-text-webpack-plugin
-
-/***/ },
-/* 17 */,
-/* 18 */,
-/* 19 */,
-/* 20 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var isObject = __webpack_require__(21),
-	    now = __webpack_require__(22),
-	    toNumber = __webpack_require__(23);
+	var isObject = __webpack_require__(2),
+	    now = __webpack_require__(3),
+	    toNumber = __webpack_require__(6);
 
 	/** Error message constants. */
 	var FUNC_ERROR_TEXT = 'Expected a function';
@@ -957,7 +791,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 21 */
+/* 2 */
 /***/ function(module, exports) {
 
 	/**
@@ -994,10 +828,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 22 */
+/* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var root = __webpack_require__(7);
+	var root = __webpack_require__(4);
 
 	/**
 	 * Gets the timestamp of the number of milliseconds that have elapsed since
@@ -1023,11 +857,37 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 23 */
+/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isObject = __webpack_require__(21),
-	    isSymbol = __webpack_require__(4);
+	var freeGlobal = __webpack_require__(5);
+
+	/** Detect free variable `self`. */
+	var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
+
+	/** Used as a reference to the global object. */
+	var root = freeGlobal || freeSelf || Function('return this')();
+
+	module.exports = root;
+
+
+/***/ },
+/* 5 */
+/***/ function(module, exports) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {/** Detect free variable `global` from Node.js. */
+	var freeGlobal = typeof global == 'object' && global && global.Object === Object && global;
+
+	module.exports = freeGlobal;
+
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var isObject = __webpack_require__(2),
+	    isSymbol = __webpack_require__(7);
 
 	/** Used as references for various `Number` constants. */
 	var NAN = 0 / 0;
@@ -1093,6 +953,214 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	module.exports = toNumber;
 
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var baseGetTag = __webpack_require__(8),
+	    isObjectLike = __webpack_require__(12);
+
+	/** `Object#toString` result references. */
+	var symbolTag = '[object Symbol]';
+
+	/**
+	 * Checks if `value` is classified as a `Symbol` primitive or object.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 4.0.0
+	 * @category Lang
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is a symbol, else `false`.
+	 * @example
+	 *
+	 * _.isSymbol(Symbol.iterator);
+	 * // => true
+	 *
+	 * _.isSymbol('abc');
+	 * // => false
+	 */
+	function isSymbol(value) {
+	  return typeof value == 'symbol' ||
+	    (isObjectLike(value) && baseGetTag(value) == symbolTag);
+	}
+
+	module.exports = isSymbol;
+
+
+/***/ },
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Symbol = __webpack_require__(9),
+	    getRawTag = __webpack_require__(10),
+	    objectToString = __webpack_require__(11);
+
+	/** `Object#toString` result references. */
+	var nullTag = '[object Null]',
+	    undefinedTag = '[object Undefined]';
+
+	/** Built-in value references. */
+	var symToStringTag = Symbol ? Symbol.toStringTag : undefined;
+
+	/**
+	 * The base implementation of `getTag` without fallbacks for buggy environments.
+	 *
+	 * @private
+	 * @param {*} value The value to query.
+	 * @returns {string} Returns the `toStringTag`.
+	 */
+	function baseGetTag(value) {
+	  if (value == null) {
+	    return value === undefined ? undefinedTag : nullTag;
+	  }
+	  return (symToStringTag && symToStringTag in Object(value))
+	    ? getRawTag(value)
+	    : objectToString(value);
+	}
+
+	module.exports = baseGetTag;
+
+
+/***/ },
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var root = __webpack_require__(4);
+
+	/** Built-in value references. */
+	var Symbol = root.Symbol;
+
+	module.exports = Symbol;
+
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Symbol = __webpack_require__(9);
+
+	/** Used for built-in method references. */
+	var objectProto = Object.prototype;
+
+	/** Used to check objects for own properties. */
+	var hasOwnProperty = objectProto.hasOwnProperty;
+
+	/**
+	 * Used to resolve the
+	 * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
+	 * of values.
+	 */
+	var nativeObjectToString = objectProto.toString;
+
+	/** Built-in value references. */
+	var symToStringTag = Symbol ? Symbol.toStringTag : undefined;
+
+	/**
+	 * A specialized version of `baseGetTag` which ignores `Symbol.toStringTag` values.
+	 *
+	 * @private
+	 * @param {*} value The value to query.
+	 * @returns {string} Returns the raw `toStringTag`.
+	 */
+	function getRawTag(value) {
+	  var isOwn = hasOwnProperty.call(value, symToStringTag),
+	      tag = value[symToStringTag];
+
+	  try {
+	    value[symToStringTag] = undefined;
+	    var unmasked = true;
+	  } catch (e) {}
+
+	  var result = nativeObjectToString.call(value);
+	  if (unmasked) {
+	    if (isOwn) {
+	      value[symToStringTag] = tag;
+	    } else {
+	      delete value[symToStringTag];
+	    }
+	  }
+	  return result;
+	}
+
+	module.exports = getRawTag;
+
+
+/***/ },
+/* 11 */
+/***/ function(module, exports) {
+
+	/** Used for built-in method references. */
+	var objectProto = Object.prototype;
+
+	/**
+	 * Used to resolve the
+	 * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
+	 * of values.
+	 */
+	var nativeObjectToString = objectProto.toString;
+
+	/**
+	 * Converts `value` to a string using `Object.prototype.toString`.
+	 *
+	 * @private
+	 * @param {*} value The value to convert.
+	 * @returns {string} Returns the converted string.
+	 */
+	function objectToString(value) {
+	  return nativeObjectToString.call(value);
+	}
+
+	module.exports = objectToString;
+
+
+/***/ },
+/* 12 */
+/***/ function(module, exports) {
+
+	/**
+	 * Checks if `value` is object-like. A value is object-like if it's not `null`
+	 * and has a `typeof` result of "object".
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 4.0.0
+	 * @category Lang
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
+	 * @example
+	 *
+	 * _.isObjectLike({});
+	 * // => true
+	 *
+	 * _.isObjectLike([1, 2, 3]);
+	 * // => true
+	 *
+	 * _.isObjectLike(_.noop);
+	 * // => false
+	 *
+	 * _.isObjectLike(null);
+	 * // => false
+	 */
+	function isObjectLike(value) {
+	  return value != null && typeof value == 'object';
+	}
+
+	module.exports = isObjectLike;
+
+
+/***/ },
+/* 13 */
+/***/ function(module, exports) {
+
+	module.exports = __WEBPACK_EXTERNAL_MODULE_13__;
+
+/***/ },
+/* 14 */
+/***/ function(module, exports) {
+
+	// removed by extract-text-webpack-plugin
 
 /***/ }
 /******/ ])

@@ -336,7 +336,7 @@ class Selectus {
 
       const $item = $selectedItems.find('.selectus__selected-item:last-child');
 
-      const rightВorderSelectedLastItemPosition = $item.offset().left + $item.innerWidth() + 1;
+      const rightВorderSelectedLastItemPosition = $item.offset().left + $item.innerWidth() + 3;
 
       if (rightВorderSelectedLastItemPosition > rightВorderSelectusPosition) {
 
@@ -385,7 +385,28 @@ class Selectus {
 
    }
 
+   addItemsToList(items, $items) {
+
+      if (!items.length) {
+         return;
+      }
+
+      items.forEach(item => {
+
+         let additionalClass = '';
+
+         if (item.selected) {
+            additionalClass = ` ${itemSelectedClass}`;
+         }
+
+         $items.append(`<p class="selectus__item${additionalClass}" data-id="${item.id}">${item.name}</p>`);
+
+      });
+   }
+
    updateHTMLData() {
+
+      const self = this;
 
       const {
               options,
@@ -395,7 +416,7 @@ class Selectus {
                 $tabs,
                 $lists
               }
-            } = this;
+            } = self;
 
       $title.html(options.typesName);
 
@@ -406,9 +427,6 @@ class Selectus {
          const $tab = $(`<a class="selectus__tab" href>${o.name}</a>`);
 
          const $list = $('<div class="selectus__list" style="display: none;">\
-                             <div class="selectus__search">\
-                                <input class="selectus__search-input">\
-                             </div>\
                              <div class="selectus__items"></div>\
                           </div>');
 
@@ -426,23 +444,90 @@ class Selectus {
 
          $lists.append($list);
 
-         const $items = $list.find('.selectus__items');
+         if (o.ajax) {
 
-         o.items.forEach(item => {
+            const $search = $(`<div class="selectus__search">\
+                                 <input class="selectus__search-input" placeholder="Start to type" data-url="${o.ajax.url}">\
+                               </div>`);
 
-            let additionalClass = '';
+            $list.prepend($search);
 
-            if (item.selected) {
-               additionalClass = ` ${itemSelectedClass}`;
+            const $searchInput = $search.find('.selectus__search-input');
+
+            let delay = 250;
+
+            if (o.ajax.delay) {
+               delay = parseFloat(o.delay, 10);
             }
 
-            $items.append(`<p class="selectus__item${additionalClass}" data-id="${item.id}">${item.name}</p>`);
+           const $items = $list.find('.selectus__items');
+            
+            const keyup = debounce(e => {
 
-         });
+               const isLetter = (e.which >= 48 && e.which <= 90) || e.which === 8;
+
+               if (!isLetter) {
+                  return;
+               }
+
+               const val = $searchInput.val();
+
+               let data = {
+                  q: val
+               };
+
+               if (o.ajax.data) {
+                  data = o.ajax.data({
+                     term: $.trim($searchInput.val())
+                  });
+               }
+
+               $.ajax({
+                  url: $searchInput.data('url'),
+                  data
+               }).then(data => {
+
+                  data = {
+                     items: [
+                        {
+                           id: 10,
+                           name: '12345677645345345',
+                           selected: true
+                        },
+                        {
+                           id: 11,
+                           name: '12345'
+                        },
+                        {
+                           id: 12,
+                           name: '12345'
+                        }
+                     ]
+                  }
+
+                  if (o.ajax.processResults) {
+                     data = o.ajax.processResults(data)
+                  }
+
+                  self.addItemsToList(data, $items);
+                  
+                  // console.log('data', data);
+
+               });
+
+            }, delay);
+
+            $searchInput.on('keyup', keyup);
+
+         } else {
+
+            self.addItemsToList(o.items, $list.find('.selectus__items'));
+
+         }
 
       });
 
-      this.setSelectedItemsOfCurrentTab();
+      self.setSelectedItemsOfCurrentTab();
 
    }
 
@@ -485,8 +570,6 @@ const pluginName = 'selectus'
 
 $.fn[pluginName] = function (option) {
    return this.each((i, el) => {
-
-      console.log(typeof option);
 
       let $this = $(el);
       let data = $this.data(`__${pluginName}`);
