@@ -7,7 +7,7 @@
 		exports["selectus"] = factory(require("jquery"));
 	else
 		root["selectus"] = factory(root["jQuery"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_13__) {
+})(this, function(__WEBPACK_EXTERNAL_MODULE_14__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -60,11 +60,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	   value: true
 	});
 
-	var _throttle2 = __webpack_require__(18);
+	var _throttle2 = __webpack_require__(1);
 
 	var _throttle3 = _interopRequireDefault(_throttle2);
 
-	var _debounce2 = __webpack_require__(1);
+	var _debounce2 = __webpack_require__(2);
 
 	var _debounce3 = _interopRequireDefault(_debounce2);
 
@@ -72,7 +72,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _jquery = __webpack_require__(13);
+	var _jquery = __webpack_require__(14);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
@@ -80,7 +80,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	__webpack_require__(14);
+	__webpack_require__(15);
 
 	var selectedItemClass = 'selectus__selected-item';
 	var dropdownOpenClass = 'selectus_dropdown-open';
@@ -88,6 +88,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var listSelectedClass = 'selectus__list_selected';
 	var itemSelectedClass = 'selectus__item_selected';
 	var manySelectedItemsExpandClass = 'selectus_many-selected-items_expand';
+	var moreLoaderClass = 'selectus__more_loader';
 
 	var Selectus = function () {
 	   function Selectus(element, options) {
@@ -363,9 +364,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	             $selectedItems = _elements5.$selectedItems;
 
 
-	         var rightВorderSelectusPosition = $element.offset().left + $element.innerWidth();
-
 	         var $item = $selectedItems.find('.selectus__selected-item:last-child');
+
+	         if (!$item.length) {
+	            return;
+	         }
+
+	         var rightВorderSelectusPosition = $element.offset().left + $element.innerWidth();
 
 	         var rightВorderSelectedLastItemPosition = $item.offset().left + $item.innerWidth() + 3;
 
@@ -413,6 +418,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return;
 	         }
 
+	         var html = '';
+
 	         items.forEach(function (item) {
 
 	            var additionalClass = '';
@@ -421,7 +428,128 @@ return /******/ (function(modules) { // webpackBootstrap
 	               additionalClass = ' ' + itemSelectedClass;
 	            }
 
-	            $items.append('<p class="selectus__item' + additionalClass + '" data-id="' + item.id + '">' + item.name + '</p>');
+	            html += '<p class="selectus__item' + additionalClass + '" data-id="' + item.id + '">' + item.name + '</p>';
+	         });
+
+	         var $lastChild = $items.find('selectus__item:last-child');
+
+	         if ($lastChild.length) {
+
+	            $lastChild.append(html);
+	         } else {
+
+	            $items.prepend(html);
+	         }
+	      }
+	   }, {
+	      key: 'getRemoteData',
+	      value: function getRemoteData(options) {
+	         var callbackBefore = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function () {};
+	         var callbackAfter = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : function () {};
+
+
+	         var self = this;
+
+	         var data = {
+	            q: options.term,
+	            p: options.page,
+	            n: options.numPerPage
+	         };
+
+	         if (options.data) {
+	            data = options.data({
+	               term: options.term,
+	               page: options.page,
+	               num: options.numPerPage
+	            });
+	         }
+
+	         if (options.ajax && options.ajax.abort) {
+	            options.ajax.abort();
+	         }
+
+	         options.ajax = _jquery2.default.ajax({
+	            url: options.url,
+	            data: data
+	         });
+
+	         callbackBefore();
+
+	         options.ajax.then(function (data) {
+
+	            data = {
+	               items: [{
+	                  id: 10,
+	                  name: '12345677645345345',
+	                  selected: true
+	               }, {
+	                  id: 11,
+	                  name: '12345'
+	               }, {
+	                  id: 12,
+	                  name: '12345'
+	               }, {
+	                  id: 11,
+	                  name: '12345'
+	               }, {
+	                  id: 12,
+	                  name: '12345'
+	               }, {
+	                  id: 11,
+	                  name: '12345'
+	               }, {
+	                  id: 12,
+	                  name: '12345'
+	               }, {
+	                  id: 11,
+	                  name: '12345'
+	               }, {
+	                  id: 12,
+	                  name: '12345'
+	               }, {
+	                  id: 11,
+	                  name: '12345'
+	               }, {
+	                  id: 10,
+	                  name: '12345677645345345',
+	                  selected: true
+	               }, {
+	                  id: 11,
+	                  name: '12345'
+	               }, {
+	                  id: 12,
+	                  name: '12345'
+	               }, {
+	                  id: 11,
+	                  name: '12345'
+	               }, {
+	                  id: 12,
+	                  name: '12345'
+	               }, {
+	                  id: 11,
+	                  name: '12345'
+	               }, {
+	                  id: 12,
+	                  name: '12345'
+	               }, {
+	                  id: 11,
+	                  name: '12345'
+	               }, {
+	                  id: 12,
+	                  name: '12345'
+	               }, {
+	                  id: 11,
+	                  name: '12345'
+	               }]
+	            };
+
+	            if (options.processResults) {
+	               data = options.processResults(data);
+	            }
+
+	            self.addItemsToList(data, options.$items);
+
+	            callbackAfter(data);
 	         });
 	      }
 	   }, {
@@ -470,20 +598,26 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	                  var $searchInput = $search.find('.selectus__search-input');
 
-	                  var delay = 250;
-
-	                  if (o.ajax.delay) {
-	                     delay = parseFloat(o.delay, 10);
-	                  }
-
 	                  var options = {
 	                     url: o.ajax.url,
-	                     page: 1
+	                     page: 1,
+	                     numPerPage: o.ajax.numPerPage || 30,
+	                     delay: o.ajax.delay || 150
 	                  };
 
-	                  $list.data('options', options);
+	                  if (o.ajax.data) {
+	                     options.data = o.ajax.data;
+	                  }
+
+	                  if (o.ajax.processResults) {
+	                     options.processResults = o.ajax.processResults;
+	                  }
+
+	                  var $more = (0, _jquery2.default)('<div class="selectus__more"><a href class="selectus__show-more">Show more</a><span class="selectus__loader"></span></div>');
 
 	                  var $items = $list.find('.selectus__items');
+
+	                  options.$items = $items;
 
 	                  $searchInput.on('keyup', (0, _debounce3.default)(function (e) {
 
@@ -495,61 +629,24 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	                     var val = _jquery2.default.trim($searchInput.val());
 
-	                     var options = $list.data('options');
-
 	                     _jquery2.default.extend(options, {
 	                        term: val,
 	                        page: 1
 	                     });
 
-	                     var data = {
-	                        q: val,
-	                        p: options.page
-	                     };
+	                     self.getRemoteData(options, function () {
 
-	                     if (o.ajax.data) {
-	                        data = o.ajax.data({
-	                           term: val,
-	                           page: options.page
-	                        });
-	                     }
+	                        $items.empty();
+	                     }, function () {
 
-	                     if (options.ajax && options.ajax.abort) {
-	                        options.ajax.abort();
-	                     }
+	                        if ($items.get(0).scrollHeight > $items.innerHeight()) {
 
-	                     options.ajax = _jquery2.default.ajax({
-	                        url: options.url,
-	                        data: data
-	                     });
-
-	                     options.ajax.then(function (data) {
-
-	                        data = {
-	                           items: [{
-	                              id: 10,
-	                              name: '12345677645345345',
-	                              selected: true
-	                           }, {
-	                              id: 11,
-	                              name: '12345'
-	                           }, {
-	                              id: 12,
-	                              name: '12345'
-	                           }]
-	                        };
-
-	                        if (o.ajax.processResults) {
-	                           data = o.ajax.processResults(data);
+	                           $items.append($more);
 	                        }
-
-	                        self.addItemsToList(data, $items);
 	                     });
+	                  }, options.delay));
 
-	                     $list.data('options', options);
-	                  }, delay));
-
-	                  var pointDistanceToBottom = 50;
+	                  var pointDistanceToBottom = 100;
 
 	                  $items.on('scroll', (0, _throttle3.default)(function () {
 
@@ -559,7 +656,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        return;
 	                     }
 
-	                     var options = $list.data('options');
+	                     $more.addClass(moreLoaderClass);
 
 	                     if (options.ajax && options.ajax.readyState !== 4) {
 	                        return;
@@ -569,54 +666,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        page: options.page + 1
 	                     });
 
-	                     var data = {
-	                        q: options.term,
-	                        p: options.page
-	                     };
+	                     self.getRemoteData(options, function () {}, function (data) {
 
-	                     if (o.ajax.data) {
-	                        data = o.ajax.data({
-	                           term: options.term,
-	                           page: options.page
-	                        });
-	                     }
+	                        if (data.length < options.numPerPage) {
 
-	                     var $loader = (0, _jquery2.default)('<div class="selectus__loader-wrap"><span class="selectus__loader"></span></div>');
+	                           $more.remove();
 
-	                     $items.$loader($loader);
+	                           $items.off('scroll');
+	                        } else {
 
-	                     options.ajax = _jquery2.default.ajax({
-	                        url: options.url,
-	                        data: data
-	                     });
-
-	                     options.ajax.then(function (data) {
-
-	                        data = {
-	                           items: [{
-	                              id: 10,
-	                              name: '12345677645345345',
-	                              selected: true
-	                           }, {
-	                              id: 11,
-	                              name: '12345'
-	                           }, {
-	                              id: 12,
-	                              name: '12345'
-	                           }]
-	                        };
-
-	                        if (o.ajax.processResults) {
-	                           data = o.ajax.processResults(data);
+	                           $more.removeClass(moreLoaderClass);
 	                        }
-
-	                        self.addItemsToList(data, $items);
-
-	                        $loader.remove();
 	                     });
-
-	                     $list.data('options', options);
-	                  }, 100));
+	                  }, self.options.loadingPointFromBottom));
 	               })();
 	            } else {
 
@@ -644,7 +706,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	Selectus.defaults = {
 	   offset: 100,
-	   speed: 500,
+	   loadingPointFromBottom: 150,
 	   mainHTML: '<div class="selectus__brief">\
 	                 <p class="selectus__current">\
 	                    <a href class="selectus__current-type"></a>\
@@ -696,9 +758,84 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isObject = __webpack_require__(2),
-	    now = __webpack_require__(3),
-	    toNumber = __webpack_require__(6);
+	var debounce = __webpack_require__(2),
+	    isObject = __webpack_require__(3);
+
+	/** Error message constants. */
+	var FUNC_ERROR_TEXT = 'Expected a function';
+
+	/**
+	 * Creates a throttled function that only invokes `func` at most once per
+	 * every `wait` milliseconds. The throttled function comes with a `cancel`
+	 * method to cancel delayed `func` invocations and a `flush` method to
+	 * immediately invoke them. Provide `options` to indicate whether `func`
+	 * should be invoked on the leading and/or trailing edge of the `wait`
+	 * timeout. The `func` is invoked with the last arguments provided to the
+	 * throttled function. Subsequent calls to the throttled function return the
+	 * result of the last `func` invocation.
+	 *
+	 * **Note:** If `leading` and `trailing` options are `true`, `func` is
+	 * invoked on the trailing edge of the timeout only if the throttled function
+	 * is invoked more than once during the `wait` timeout.
+	 *
+	 * If `wait` is `0` and `leading` is `false`, `func` invocation is deferred
+	 * until to the next tick, similar to `setTimeout` with a timeout of `0`.
+	 *
+	 * See [David Corbacho's article](https://css-tricks.com/debouncing-throttling-explained-examples/)
+	 * for details over the differences between `_.throttle` and `_.debounce`.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 0.1.0
+	 * @category Function
+	 * @param {Function} func The function to throttle.
+	 * @param {number} [wait=0] The number of milliseconds to throttle invocations to.
+	 * @param {Object} [options={}] The options object.
+	 * @param {boolean} [options.leading=true]
+	 *  Specify invoking on the leading edge of the timeout.
+	 * @param {boolean} [options.trailing=true]
+	 *  Specify invoking on the trailing edge of the timeout.
+	 * @returns {Function} Returns the new throttled function.
+	 * @example
+	 *
+	 * // Avoid excessively updating the position while scrolling.
+	 * jQuery(window).on('scroll', _.throttle(updatePosition, 100));
+	 *
+	 * // Invoke `renewToken` when the click event is fired, but not more than once every 5 minutes.
+	 * var throttled = _.throttle(renewToken, 300000, { 'trailing': false });
+	 * jQuery(element).on('click', throttled);
+	 *
+	 * // Cancel the trailing throttled invocation.
+	 * jQuery(window).on('popstate', throttled.cancel);
+	 */
+	function throttle(func, wait, options) {
+	  var leading = true,
+	      trailing = true;
+
+	  if (typeof func != 'function') {
+	    throw new TypeError(FUNC_ERROR_TEXT);
+	  }
+	  if (isObject(options)) {
+	    leading = 'leading' in options ? !!options.leading : leading;
+	    trailing = 'trailing' in options ? !!options.trailing : trailing;
+	  }
+	  return debounce(func, wait, {
+	    'leading': leading,
+	    'maxWait': wait,
+	    'trailing': trailing
+	  });
+	}
+
+	module.exports = throttle;
+
+
+/***/ },
+/* 2 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var isObject = __webpack_require__(3),
+	    now = __webpack_require__(4),
+	    toNumber = __webpack_require__(7);
 
 	/** Error message constants. */
 	var FUNC_ERROR_TEXT = 'Expected a function';
@@ -887,7 +1024,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 2 */
+/* 3 */
 /***/ function(module, exports) {
 
 	/**
@@ -924,10 +1061,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 3 */
+/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var root = __webpack_require__(4);
+	var root = __webpack_require__(5);
 
 	/**
 	 * Gets the timestamp of the number of milliseconds that have elapsed since
@@ -953,10 +1090,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 4 */
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var freeGlobal = __webpack_require__(5);
+	var freeGlobal = __webpack_require__(6);
 
 	/** Detect free variable `self`. */
 	var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
@@ -968,7 +1105,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 5 */
+/* 6 */
 /***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/** Detect free variable `global` from Node.js. */
@@ -979,11 +1116,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 6 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isObject = __webpack_require__(2),
-	    isSymbol = __webpack_require__(7);
+	var isObject = __webpack_require__(3),
+	    isSymbol = __webpack_require__(8);
 
 	/** Used as references for various `Number` constants. */
 	var NAN = 0 / 0;
@@ -1051,11 +1188,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var baseGetTag = __webpack_require__(8),
-	    isObjectLike = __webpack_require__(12);
+	var baseGetTag = __webpack_require__(9),
+	    isObjectLike = __webpack_require__(13);
 
 	/** `Object#toString` result references. */
 	var symbolTag = '[object Symbol]';
@@ -1086,12 +1223,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Symbol = __webpack_require__(9),
-	    getRawTag = __webpack_require__(10),
-	    objectToString = __webpack_require__(11);
+	var Symbol = __webpack_require__(10),
+	    getRawTag = __webpack_require__(11),
+	    objectToString = __webpack_require__(12);
 
 	/** `Object#toString` result references. */
 	var nullTag = '[object Null]',
@@ -1120,10 +1257,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 9 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var root = __webpack_require__(4);
+	var root = __webpack_require__(5);
 
 	/** Built-in value references. */
 	var Symbol = root.Symbol;
@@ -1132,10 +1269,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 10 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Symbol = __webpack_require__(9);
+	var Symbol = __webpack_require__(10);
 
 	/** Used for built-in method references. */
 	var objectProto = Object.prototype;
@@ -1184,7 +1321,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 11 */
+/* 12 */
 /***/ function(module, exports) {
 
 	/** Used for built-in method references. */
@@ -1212,7 +1349,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 12 */
+/* 13 */
 /***/ function(module, exports) {
 
 	/**
@@ -1247,94 +1384,16 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 13 */
-/***/ function(module, exports) {
-
-	module.exports = __WEBPACK_EXTERNAL_MODULE_13__;
-
-/***/ },
 /* 14 */
 /***/ function(module, exports) {
 
-	// removed by extract-text-webpack-plugin
+	module.exports = __WEBPACK_EXTERNAL_MODULE_14__;
 
 /***/ },
-/* 15 */,
-/* 16 */,
-/* 17 */,
-/* 18 */
-/***/ function(module, exports, __webpack_require__) {
+/* 15 */
+/***/ function(module, exports) {
 
-	var debounce = __webpack_require__(1),
-	    isObject = __webpack_require__(2);
-
-	/** Error message constants. */
-	var FUNC_ERROR_TEXT = 'Expected a function';
-
-	/**
-	 * Creates a throttled function that only invokes `func` at most once per
-	 * every `wait` milliseconds. The throttled function comes with a `cancel`
-	 * method to cancel delayed `func` invocations and a `flush` method to
-	 * immediately invoke them. Provide `options` to indicate whether `func`
-	 * should be invoked on the leading and/or trailing edge of the `wait`
-	 * timeout. The `func` is invoked with the last arguments provided to the
-	 * throttled function. Subsequent calls to the throttled function return the
-	 * result of the last `func` invocation.
-	 *
-	 * **Note:** If `leading` and `trailing` options are `true`, `func` is
-	 * invoked on the trailing edge of the timeout only if the throttled function
-	 * is invoked more than once during the `wait` timeout.
-	 *
-	 * If `wait` is `0` and `leading` is `false`, `func` invocation is deferred
-	 * until to the next tick, similar to `setTimeout` with a timeout of `0`.
-	 *
-	 * See [David Corbacho's article](https://css-tricks.com/debouncing-throttling-explained-examples/)
-	 * for details over the differences between `_.throttle` and `_.debounce`.
-	 *
-	 * @static
-	 * @memberOf _
-	 * @since 0.1.0
-	 * @category Function
-	 * @param {Function} func The function to throttle.
-	 * @param {number} [wait=0] The number of milliseconds to throttle invocations to.
-	 * @param {Object} [options={}] The options object.
-	 * @param {boolean} [options.leading=true]
-	 *  Specify invoking on the leading edge of the timeout.
-	 * @param {boolean} [options.trailing=true]
-	 *  Specify invoking on the trailing edge of the timeout.
-	 * @returns {Function} Returns the new throttled function.
-	 * @example
-	 *
-	 * // Avoid excessively updating the position while scrolling.
-	 * jQuery(window).on('scroll', _.throttle(updatePosition, 100));
-	 *
-	 * // Invoke `renewToken` when the click event is fired, but not more than once every 5 minutes.
-	 * var throttled = _.throttle(renewToken, 300000, { 'trailing': false });
-	 * jQuery(element).on('click', throttled);
-	 *
-	 * // Cancel the trailing throttled invocation.
-	 * jQuery(window).on('popstate', throttled.cancel);
-	 */
-	function throttle(func, wait, options) {
-	  var leading = true,
-	      trailing = true;
-
-	  if (typeof func != 'function') {
-	    throw new TypeError(FUNC_ERROR_TEXT);
-	  }
-	  if (isObject(options)) {
-	    leading = 'leading' in options ? !!options.leading : leading;
-	    trailing = 'trailing' in options ? !!options.trailing : trailing;
-	  }
-	  return debounce(func, wait, {
-	    'leading': leading,
-	    'maxWait': wait,
-	    'trailing': trailing
-	  });
-	}
-
-	module.exports = throttle;
-
+	// removed by extract-text-webpack-plugin
 
 /***/ }
 /******/ ])

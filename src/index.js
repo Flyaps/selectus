@@ -9,6 +9,7 @@ const tabSelectedClass = 'selectus__tab_selected';
 const listSelectedClass = 'selectus__list_selected';
 const itemSelectedClass = 'selectus__item_selected';
 const manySelectedItemsExpandClass = 'selectus_many-selected-items_expand';
+const moreLoaderClass = 'selectus__more_loader';
 
 class Selectus {
 
@@ -332,9 +333,14 @@ class Selectus {
               }
             } = this;
 
-      const rightВorderSelectusPosition = $element.offset().left + $element.innerWidth();
 
       const $item = $selectedItems.find('.selectus__selected-item:last-child');
+
+      if (!$item.length) {
+         return;
+      }
+
+      const rightВorderSelectusPosition = $element.offset().left + $element.innerWidth();
 
       const rightВorderSelectedLastItemPosition = $item.offset().left + $item.innerWidth() + 3;
 
@@ -391,6 +397,8 @@ class Selectus {
          return;
       }
 
+      let html = '';
+
       items.forEach(item => {
 
          let additionalClass = '';
@@ -399,9 +407,152 @@ class Selectus {
             additionalClass = ` ${itemSelectedClass}`;
          }
 
-         $items.append(`<p class="selectus__item${additionalClass}" data-id="${item.id}">${item.name}</p>`);
+         html += `<p class="selectus__item${additionalClass}" data-id="${item.id}">${item.name}</p>`;
 
       });
+
+      const $lastChild = $items.find('selectus__item:last-child');
+
+      if ($lastChild.length) {
+
+         $lastChild.append(html);
+
+      } else {
+
+         $items.prepend(html);
+
+      }
+
+   }
+
+   getRemoteData(options, callbackBefore = () => {}, callbackAfter = () => {}) {
+
+      let self = this;
+
+      let data = {
+         q: options.term,
+         p: options.page,
+         n: options.numPerPage
+      };
+
+      if (options.data) {
+         data = options.data({
+            term: options.term,
+            page: options.page,
+            num: options.numPerPage
+         });
+      }
+
+      if (options.ajax && options.ajax.abort) {
+         options.ajax.abort();
+      }
+
+      options.ajax = $.ajax({
+         url: options.url,
+         data
+      });
+
+      callbackBefore();
+
+      options.ajax.then(data => {
+
+         data = {
+            items: [
+               {
+                  id: 10,
+                  name: '12345677645345345',
+                  selected: true
+               },
+               {
+                  id: 11,
+                  name: '12345'
+               },
+               {
+                  id: 12,
+                  name: '12345'
+               },
+               {
+                  id: 11,
+                  name: '12345'
+               },
+               {
+                  id: 12,
+                  name: '12345'
+               },
+               {
+                  id: 11,
+                  name: '12345'
+               },
+               {
+                  id: 12,
+                  name: '12345'
+               },
+               {
+                  id: 11,
+                  name: '12345'
+               },
+               {
+                  id: 12,
+                  name: '12345'
+               },
+               {
+                  id: 11,
+                  name: '12345'
+               },
+               {
+                  id: 10,
+                  name: '12345677645345345',
+                  selected: true
+               },
+               {
+                  id: 11,
+                  name: '12345'
+               },
+               {
+                  id: 12,
+                  name: '12345'
+               },
+               {
+                  id: 11,
+                  name: '12345'
+               },
+               {
+                  id: 12,
+                  name: '12345'
+               },
+               {
+                  id: 11,
+                  name: '12345'
+               },
+               {
+                  id: 12,
+                  name: '12345'
+               },
+               {
+                  id: 11,
+                  name: '12345'
+               },
+               {
+                  id: 12,
+                  name: '12345'
+               },
+               {
+                  id: 11,
+                  name: '12345'
+               }
+            ]
+         }
+
+         if (options.processResults) {
+            data = options.processResults(data)
+         }
+
+         self.addItemsToList(data, options.$items);
+
+         callbackAfter(data);
+
+      });
+
    }
 
    updateHTMLData() {
@@ -454,20 +605,26 @@ class Selectus {
 
             const $searchInput = $search.find('.selectus__search-input');
 
-            let delay = 250;
-
-            if (o.ajax.delay) {
-               delay = parseFloat(o.delay, 10);
-            }
-
             let options = {
                url: o.ajax.url,
-               page: 1
+               page: 1,
+               numPerPage: o.ajax.numPerPage || 30,
+               delay: o.ajax.delay || 150
             }
 
-            $list.data('options', options);
+            if (o.ajax.data) {
+               options.data = o.ajax.data
+            }
+
+            if (o.ajax.processResults) {
+               options.processResults = o.ajax.processResults
+            }
+
+            const $more = $(`<div class="selectus__more"><a href class="selectus__show-more">Show more</a><span class="selectus__loader"></span></div>`);
 
             const $items = $list.find('.selectus__items');
+
+            options.$items = $items;
 
             $searchInput.on('keyup', debounce(e => {
 
@@ -479,67 +636,32 @@ class Selectus {
 
                const val = $.trim($searchInput.val());
 
-               let options = $list.data('options');
-
                $.extend(options, {
                   term: val,
                   page: 1
                });
 
-               let data = {
-                  q: val,
-                  p: options.page
-               };
+               self.getRemoteData(
+                 options,
+                 ()=> {
 
-               if (o.ajax.data) {
-                  data = o.ajax.data({
-                     term: val,
-                     page: options.page
-                  });
-               }
+                    $items.empty();
 
-               if (options.ajax && options.ajax.abort) {
-                  options.ajax.abort();
-               }
+                 },
+                 () => {
 
-               options.ajax = $.ajax({
-                  url: options.url,
-                  data
-               });
+                    if ($items.get(0).scrollHeight > $items.innerHeight()) {
 
-               options.ajax.then(data => {
+                       $items.append($more);
 
-                  data = {
-                     items: [
-                        {
-                           id: 10,
-                           name: '12345677645345345',
-                           selected: true
-                        },
-                        {
-                           id: 11,
-                           name: '12345'
-                        },
-                        {
-                           id: 12,
-                           name: '12345'
-                        }
-                     ]
-                  }
+                    }
 
-                  if (o.ajax.processResults) {
-                     data = o.ajax.processResults(data)
-                  }
+                 }
+               );
 
-                  self.addItemsToList(data, $items);
+            }, options.delay));
 
-               });
-
-               $list.data('options', options);
-
-            }, delay));
-
-            const pointDistanceToBottom = 50;
+            const pointDistanceToBottom = 100;
 
             $items.on('scroll', throttle(() => {
 
@@ -549,70 +671,37 @@ class Selectus {
                   return;
                }
 
-               let options = $list.data('options');
+               $more.addClass(moreLoaderClass);
 
                if (options.ajax && options.ajax.readyState !== 4) {
-                 return;
+                  return;
                }
 
                $.extend(options, {
                   page: options.page + 1
                });
 
-               let data = {
-                  q: options.term,
-                  p: options.page
-               };
+               self.getRemoteData(
+                 options,
+                 ()=> {},
+                 (data) => {
 
-               if (o.ajax.data) {
-                  data = o.ajax.data({
-                     term: options.term,
-                     page: options.page
-                  });
-               }
+                    if (data.length < options.numPerPage) {
 
-               const $loader = $('<div class="selectus__loader-wrap"><span class="selectus__loader"></span></div>');
+                       $more.remove();
 
-               $items.$loader($loader)
+                       $items.off('scroll');
 
-               options.ajax = $.ajax({
-                  url: options.url,
-                  data
-               });
+                    } else {
 
-               options.ajax.then(data => {
+                       $more.removeClass(moreLoaderClass);
 
-                  data = {
-                     items: [
-                        {
-                           id: 10,
-                           name: '12345677645345345',
-                           selected: true
-                        },
-                        {
-                           id: 11,
-                           name: '12345'
-                        },
-                        {
-                           id: 12,
-                           name: '12345'
-                        }
-                     ]
-                  }
+                    }
 
-                  if (o.ajax.processResults) {
-                     data = o.ajax.processResults(data)
-                  }
-
-                  self.addItemsToList(data, $items);
-
-                  $loader.remove();
-
-               });
-
-               $list.data('options', options);
-
-            }, 100));
+                 }
+               );
+               
+            }, self.options.loadingPointFromBottom));
 
          } else {
 
@@ -647,7 +736,7 @@ class Selectus {
 
 Selectus.defaults = {
    offset: 100,
-   speed: 500,
+   loadingPointFromBottom: 150,
    mainHTML: '<div class="selectus__brief">\
                  <p class="selectus__current">\
                     <a href class="selectus__current-type"></a>\
