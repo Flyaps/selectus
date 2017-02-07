@@ -14,38 +14,6 @@
             &current-type
                &:before
                   transform: rotate(180deg)
-   &_many-selected-items
-      .selectus
-         &__
-            &selected-items
-               height: 30px;
-               position: relative
-               overflow: hidden;
-               margin-right: 10px;
-               &:after
-                  width: 20px
-                  position: absolute
-                  top: 0
-                  right: 0
-                  bottom: 0
-                  background-image: linear-gradient(to right, transparent, #fff);
-                  content: ''
-            &expand
-               display inline-block
-            &collapse
-               display none
-   &_expand
-      .selectus
-         &__
-            &selected-items
-               height: auto
-               flex-wrap: wrap
-               &:after
-                  content none
-            &expand
-               display none
-            &collapse
-               display inline-block
    &__
       &brief
          min-height: 30px;
@@ -74,7 +42,28 @@
       &selected
          &-items
             display: flex
+            flex-wrap wrap
+            align-items: center;
             padding-left: 5px;
+            &_
+               &a-lot
+                  .selectus
+                     &__
+                        &selected-item_can-collapse
+                           display: none
+                        &expand
+                           display: block
+                        &collapse
+                           display: none
+               &expand
+                  .selectus
+                     &__
+                        &selected-item_can-collapse
+                           display: block
+                        &expand
+                           display: none
+                        &collapse
+                           display: block
          &-item
             max-width: 200px;
             position: relative
@@ -100,10 +89,9 @@
                cursor: pointer
       &expand, &collapse
          display: none
+         margin-left: 2px;
          border-bottom: 1px dotted #383c40
          text-decoration: none
-         &_active
-            display: inline
       &dropdown
          min-width: 200px
          position: absolute

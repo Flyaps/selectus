@@ -82,12 +82,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	__webpack_require__(15);
 
+	var selectedItemsALotClass = 'selectus__selected-items_a-lot';
+	var selectedItemsExpandClass = 'selectus__selected-items_expand';
 	var selectedItemClass = 'selectus__selected-item';
+	var selectedItemCanCollapse = 'selectus__selected-item_can-collapse';
 	var dropdownOpenClass = 'selectus_dropdown-open';
 	var tabSelectedClass = 'selectus__tab_selected';
 	var listSelectedClass = 'selectus__list_selected';
 	var itemSelectedClass = 'selectus__item_selected';
-	var manySelectedItemsExpandClass = 'selectus_many-selected-items_expand';
 	var moreLoaderClass = 'selectus__more_loader';
 
 	var Selectus = function () {
@@ -124,6 +126,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	         $element: $element,
 	         $window: (0, _jquery2.default)(window),
 	         $selectedItems: $element.find('.selectus__selected-items'),
+	         $expand: $element.find('.selectus__expand'),
+	         $collapse: $element.find('.selectus__collapse'),
 	         $dropdown: $element.find('.selectus__dropdown'),
 	         $title: $element.find('.selectus__title'),
 	         $numWrap: $element.find('.selectus__num-wrap'),
@@ -137,7 +141,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var _self$elements = self.elements,
 	          $window = _self$elements.$window,
 	          $dropdown = _self$elements.$dropdown,
-	          $currentType = _self$elements.$currentType;
+	          $currentType = _self$elements.$currentType,
+	          $selectedItems = _self$elements.$selectedItems,
+	          $expand = _self$elements.$expand,
+	          $collapse = _self$elements.$collapse;
 
 
 	      self.updateHTMLData();
@@ -199,32 +206,36 @@ return /******/ (function(modules) { // webpackBootstrap
 	            self.removeSelectedItem($self.data('id'));
 	         }
 
+	         self.setValuesToInput();
+
 	         self.setNumSelectedItems();
+
+	         self.updateVisibleSelectedItems();
 	      });
 
 	      $element.on('click', '.selectus__selected-item-remove', function (e) {
 
-	         setTimeout(function () {
-	            var $item = (0, _jquery2.default)(e.currentTarget).parent();
+	         var $item = (0, _jquery2.default)(e.currentTarget).parent();
 
-	            self.removeSelectedItem($item.data('id'));
+	         self.removeSelectedItem($item.data('id'));
 
-	            self.setNumSelectedItems();
-	         });
+	         self.setValuesToInput();
+
+	         self.setNumSelectedItems();
+
+	         self.updateVisibleSelectedItems();
 	      });
 
-	      $element.on('click', '.selectus__expand', function (e) {
-
+	      $expand.on('click', function (e) {
 	         e.preventDefault();
 
-	         $element.addClass(manySelectedItemsExpandClass);
+	         $selectedItems.addClass(selectedItemsExpandClass);
 	      });
 
-	      $element.on('click', '.selectus__collapse', function (e) {
-
+	      $collapse.on('click', function (e) {
 	         e.preventDefault();
 
-	         $element.removeClass(manySelectedItemsExpandClass);
+	         $selectedItems.removeClass(selectedItemsExpandClass);
 	      });
 
 	      $window.on('transitionend webkitTransitionEnd  MSTransitionEnd', function (e) {
@@ -255,8 +266,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            self.hideDropdown();
 	         }
 	      });
-
-	      $window.on('resize', (0, _debounce3.default)(self.updateSelectedItemsWidth.bind(self), 150));
 	   }
 
 	   _createClass(Selectus, [{
@@ -276,25 +285,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	   }, {
 	      key: 'addSelectedItem',
 	      value: function addSelectedItem(id, name) {
-	         var $selectedItems = this.elements.$selectedItems;
+	         var _elements2 = this.elements,
+	             $selectedItems = _elements2.$selectedItems,
+	             $expand = _elements2.$expand;
 
 
 	         if ($selectedItems.find('.' + selectedItemClass + '[data-id="' + id + '"]').length) {
 	            return;
 	         }
 
-	         var $item = '<span class="selectus__selected-item" data-id="' + id + '">' + name + '<span class="selectus__selected-item-remove fa fa-times"></span></span>';
+	         var $item = '<span class="' + selectedItemClass + '" data-id="' + id + '">' + name + '<span class="selectus__selected-item-remove fa fa-times"></span></span>';
 
-	         $selectedItems.append($item);
-
-	         this.setValuesToInput();
+	         $expand.before($item);
 	      }
 	   }, {
 	      key: 'removeSelectedItem',
 	      value: function removeSelectedItem(id) {
-	         var _elements2 = this.elements,
-	             $selectedItems = _elements2.$selectedItems,
-	             $lists = _elements2.$lists;
+	         var _elements3 = this.elements,
+	             $selectedItems = _elements3.$selectedItems,
+	             $lists = _elements3.$lists;
 
 
 	         var $item = $selectedItems.find('.' + selectedItemClass + '[data-id="' + id + '"]');
@@ -306,16 +315,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	         $item.remove();
 
 	         $lists.find('.' + listSelectedClass + ' .' + itemSelectedClass + '[data-id="' + id + '"]').removeClass(itemSelectedClass);
-
-	         this.setValuesToInput();
 	      }
 	   }, {
 	      key: 'setNumSelectedItems',
 	      value: function setNumSelectedItems() {
-	         var _elements3 = this.elements,
-	             $numWrap = _elements3.$numWrap,
-	             $num = _elements3.$num,
-	             $lists = _elements3.$lists;
+	         var _elements4 = this.elements,
+	             $numWrap = _elements4.$numWrap,
+	             $num = _elements4.$num,
+	             $lists = _elements4.$lists;
 
 
 	         var num = $lists.find('.' + listSelectedClass + ' .' + itemSelectedClass).length;
@@ -338,12 +345,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	         var self = this;
 
-	         var _elements4 = this.elements,
-	             $selectedItems = _elements4.$selectedItems,
-	             $lists = _elements4.$lists;
+	         var _elements5 = this.elements,
+	             $selectedItems = _elements5.$selectedItems,
+	             $lists = _elements5.$lists;
 
 
-	         $selectedItems.empty();
+	         $selectedItems.find('.' + selectedItemClass).remove();
 
 	         $lists.find('.' + listSelectedClass + ' .' + itemSelectedClass).each(function (i, item) {
 
@@ -355,31 +362,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	         this.setValuesToInput();
 
 	         this.setNumSelectedItems();
+
+	         this.updateVisibleSelectedItems();
 	      }
 	   }, {
-	      key: 'updateSelectedItemsWidth',
-	      value: function updateSelectedItemsWidth() {
-	         var _elements5 = this.elements,
-	             $element = _elements5.$element,
-	             $selectedItems = _elements5.$selectedItems;
+	      key: 'updateVisibleSelectedItems',
+	      value: function updateVisibleSelectedItems() {
+	         var $selectedItems = this.elements.$selectedItems,
+	             visibleItems = this.options.visibleItems;
 
 
-	         var $item = $selectedItems.find('.selectus__selected-item:last-child');
+	         var $items = $selectedItems.find('.selectus__selected-item');
 
-	         if (!$item.length) {
-	            return;
-	         }
+	         $items.removeClass(selectedItemCanCollapse);
 
-	         var rightВorderSelectusPosition = $element.offset().left + $element.innerWidth();
+	         if ($items.length > visibleItems) {
 
-	         var rightВorderSelectedLastItemPosition = $item.offset().left + $item.innerWidth() + 3;
+	            $selectedItems.addClass(selectedItemsALotClass);
 
-	         if (rightВorderSelectedLastItemPosition > rightВorderSelectusPosition) {
-
-	            $element.addClass('selectus_many-selected-items');
+	            $items.slice(visibleItems).addClass(selectedItemCanCollapse);
 	         } else {
-
-	            $element.removeClass('selectus_many-selected-items');
+	            $selectedItems.removeClass(selectedItemsALotClass, selectedItemsExpandClass);
 	         }
 	      }
 	   }, {
@@ -689,9 +692,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	         self.setSelectedItemsOfCurrentTab();
 	      }
 	   }, {
-	      key: 'getMoreInfo',
-	      value: function getMoreInfo($items) {}
-	   }, {
 	      key: 'val',
 	      value: function val() {
 	         var $input = this.elements.$input;
@@ -705,18 +705,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	}();
 
 	Selectus.defaults = {
-	   offset: 100,
+	   visibleItems: 3,
 	   loadingPointFromBottom: 150,
 	   mainHTML: '<div class="selectus__brief">\
 	                 <p class="selectus__current">\
 	                    <a href class="selectus__current-type"></a>\
 	                    <span class="selectus__num-wrap" style="display: none;">(<span class="selectus__num"></span>):</span>\
 	                 </p>\
-	                 <div class="selectus__selected-items"></div>\
-	                 <a class="selectus__expand" href>expand</a>\
-	                 <a class="selectus__collapse" href>collapse</a>\
+	                 <div class="selectus__selected-items">\
+	                    <a class="selectus__expand" href>expand</a>\
+	                    <a class="selectus__collapse" href>collapse</a>\
+	                 </div>\
 	              </div>\
-	              <div class="selectus__dropdown">\
+	              <div class="selectus__dropdown" style="display: none;">\
 	                 <div class="selectus__head">\
 	                    <h3 class="selectus__title"></h3>\
 	                    <div class="selectus__tabs"></div>\

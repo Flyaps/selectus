@@ -3,12 +3,14 @@ require('./main.styl');
 import {debounce, throttle} from 'lodash';
 import $ from 'jquery';
 
+const selectedItemsALotClass = 'selectus__selected-items_a-lot';
+const selectedItemsExpandClass = 'selectus__selected-items_expand';
 const selectedItemClass = 'selectus__selected-item';
+const selectedItemCanCollapse = 'selectus__selected-item_can-collapse';
 const dropdownOpenClass = 'selectus_dropdown-open';
 const tabSelectedClass = 'selectus__tab_selected';
 const listSelectedClass = 'selectus__list_selected';
 const itemSelectedClass = 'selectus__item_selected';
-const manySelectedItemsExpandClass = 'selectus_many-selected-items_expand';
 const moreLoaderClass = 'selectus__more_loader';
 
 class Selectus {
@@ -49,6 +51,8 @@ class Selectus {
          $element,
          $window: $(window),
          $selectedItems: $element.find('.selectus__selected-items'),
+         $expand: $element.find('.selectus__expand'),
+         $collapse: $element.find('.selectus__collapse'),
          $dropdown: $element.find('.selectus__dropdown'),
          $title: $element.find('.selectus__title'),
          $numWrap: $element.find('.selectus__num-wrap'),
@@ -63,7 +67,10 @@ class Selectus {
               elements: {
                 $window,
                 $dropdown,
-                $currentType
+                $currentType,
+                $selectedItems,
+                $expand,
+                $collapse
               }
             } = self;
 
@@ -133,36 +140,38 @@ class Selectus {
             self.removeSelectedItem($self.data('id'));
          }
 
+         self.setValuesToInput();
+
          self.setNumSelectedItems();
+
+         self.updateVisibleSelectedItems();
 
       });
 
       $element.on('click', '.selectus__selected-item-remove', e => {
 
-         setTimeout(() => {
-            const $item = $(e.currentTarget).parent();
+         const $item = $(e.currentTarget).parent();
 
-            self.removeSelectedItem($item.data('id'));
+         self.removeSelectedItem($item.data('id'));
 
-            self.setNumSelectedItems();
-         });
+         self.setValuesToInput();
 
-      });
+         self.setNumSelectedItems();
 
-      $element.on('click', '.selectus__expand', e => {
-
-         e.preventDefault();
-
-         $element.addClass(manySelectedItemsExpandClass);
+         self.updateVisibleSelectedItems();
 
       });
 
-      $element.on('click', '.selectus__collapse', e => {
-
+      $expand.on('click', e => {
          e.preventDefault();
 
-         $element.removeClass(manySelectedItemsExpandClass);
+         $selectedItems.addClass(selectedItemsExpandClass);
+      });
 
+      $collapse.on('click', e => {
+         e.preventDefault();
+
+         $selectedItems.removeClass(selectedItemsExpandClass);
       });
 
       $window.on('transitionend webkitTransitionEnd  MSTransitionEnd', e => {
@@ -197,7 +206,6 @@ class Selectus {
 
       });
 
-      $window.on('resize', debounce(self.updateSelectedItemsWidth.bind(self), 150));
    }
 
    setValuesToInput() {
@@ -225,7 +233,8 @@ class Selectus {
 
       const {
               elements: {
-                $selectedItems
+                $selectedItems,
+                $expand
               }
             } = this;
 
@@ -234,11 +243,10 @@ class Selectus {
          return;
       }
 
-      const $item = `<span class="selectus__selected-item" data-id="${id}">${name}<span class="selectus__selected-item-remove fa fa-times"></span></span>`
+      const $item = `<span class="${selectedItemClass}" data-id="${id}">${name}<span class="selectus__selected-item-remove fa fa-times"></span></span>`
 
-      $selectedItems.append($item);
+      $expand.before($item);
 
-      this.setValuesToInput();
    }
 
    removeSelectedItem(id) {
@@ -262,8 +270,6 @@ class Selectus {
       $lists
         .find(`.${listSelectedClass} .${itemSelectedClass}[data-id="${id}"]`)
         .removeClass(itemSelectedClass);
-
-      this.setValuesToInput();
 
    }
 
@@ -306,7 +312,7 @@ class Selectus {
               }
             } = this;
 
-      $selectedItems.empty();
+      $selectedItems.find(`.${selectedItemClass}`).remove();
 
       $lists
         .find(`.${listSelectedClass} .${itemSelectedClass}`)
@@ -322,36 +328,35 @@ class Selectus {
 
       this.setNumSelectedItems();
 
+      this.updateVisibleSelectedItems();
+
    }
 
-   updateSelectedItemsWidth() {
+   updateVisibleSelectedItems() {
 
       const {
               elements: {
-                $element,
                 $selectedItems
+              },
+              options: {
+                visibleItems
               }
             } = this;
 
+      let $items = $selectedItems.find('.selectus__selected-item');
 
-      const $item = $selectedItems.find('.selectus__selected-item:last-child');
+      $items.removeClass(selectedItemCanCollapse);
 
-      if (!$item.length) {
-         return;
-      }
+      if ($items.length > visibleItems) {
 
-      const rightВorderSelectusPosition = $element.offset().left + $element.innerWidth();
+         $selectedItems.addClass(selectedItemsALotClass);
 
-      const rightВorderSelectedLastItemPosition = $item.offset().left + $item.innerWidth() + 3;
-
-      if (rightВorderSelectedLastItemPosition > rightВorderSelectusPosition) {
-
-         $element.addClass('selectus_many-selected-items');
+         $items
+           .slice(visibleItems)
+           .addClass(selectedItemCanCollapse);
 
       } else {
-
-         $element.removeClass('selectus_many-selected-items');
-
+         $selectedItems.removeClass(selectedItemsALotClass, selectedItemsExpandClass);
       }
 
    }
@@ -643,7 +648,7 @@ class Selectus {
 
                self.getRemoteData(
                  options,
-                 ()=> {
+                 () => {
 
                     $items.empty();
 
@@ -683,7 +688,7 @@ class Selectus {
 
                self.getRemoteData(
                  options,
-                 ()=> {},
+                 () => {},
                  (data) => {
 
                     if (data.length < options.numPerPage) {
@@ -700,7 +705,7 @@ class Selectus {
 
                  }
                );
-               
+
             }, self.options.loadingPointFromBottom));
 
          } else {
@@ -712,11 +717,6 @@ class Selectus {
       });
 
       self.setSelectedItemsOfCurrentTab();
-
-   }
-
-   getMoreInfo($items) {
-
 
    }
 
@@ -735,18 +735,19 @@ class Selectus {
 }
 
 Selectus.defaults = {
-   offset: 100,
+   visibleItems: 3,
    loadingPointFromBottom: 150,
    mainHTML: '<div class="selectus__brief">\
                  <p class="selectus__current">\
                     <a href class="selectus__current-type"></a>\
                     <span class="selectus__num-wrap" style="display: none;">(<span class="selectus__num"></span>):</span>\
                  </p>\
-                 <div class="selectus__selected-items"></div>\
-                 <a class="selectus__expand" href>expand</a>\
-                 <a class="selectus__collapse" href>collapse</a>\
+                 <div class="selectus__selected-items">\
+                    <a class="selectus__expand" href>expand</a>\
+                    <a class="selectus__collapse" href>collapse</a>\
+                 </div>\
               </div>\
-              <div class="selectus__dropdown">\
+              <div class="selectus__dropdown" style="display: none;">\
                  <div class="selectus__head">\
                     <h3 class="selectus__title"></h3>\
                     <div class="selectus__tabs"></div>\
